@@ -142,6 +142,15 @@ Implementation notes:
 - Added Apple Zoom Link wrappers around asset rows and a matching `Link.AppleZoomTarget` on instrument detail.
 - Added `Stack.Toolbar` actions on instrument detail as a native toolbar pilot.
 
+### English UI Baseline
+
+The user requested that all interfaces move to English and that future development use the English version as the source of truth.
+
+Implementation notes:
+
+- Converted tab labels, screen titles, table headers, chips, CTAs, wallet labels, portfolio labels, watchlist labels, and instrument detail labels to English.
+- Updated the design brief to record English as the ongoing product UI baseline.
+
 ### Figma Wireframe Creation
 
 ```text

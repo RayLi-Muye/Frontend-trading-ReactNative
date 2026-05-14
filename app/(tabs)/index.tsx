@@ -13,7 +13,7 @@ import { colors, radius, shadows, spacing } from "@/design/theme";
 export default function HomeScreen() {
   return (
     <ScreenScroll includeTopInset bottomInset={110}>
-      <AppHeader rewardLabel="获得 $200" />
+      <AppHeader rewardLabel="Earn $200" />
 
       <HomeValueChart />
 

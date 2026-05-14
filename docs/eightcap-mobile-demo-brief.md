@@ -13,6 +13,7 @@ Implementation update:
 - Keep the visible app experience closer to a real in-use account product. Avoid repeated on-screen explanations that the build is a demo.
 - Preserve Eightcap's homepage color logic: white/near-white canvas, strong black typography, bright green accent, light gray controls, and red/green market movement.
 - Use the provided Tradle iPhone references for structure and density: home, my investments, watchlist, and wallet balance.
+- Use English as the product UI baseline for all future implementation and design iterations.
 
 ## Reference Signals From Eightcap
 

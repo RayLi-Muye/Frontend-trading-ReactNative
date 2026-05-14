@@ -12,7 +12,7 @@ import { colors, radius, shadows, spacing } from "@/design/theme";
 import { useLiveHoldings } from "@/hooks/use-live-market";
 import { formatCurrency, formatSignedCurrency } from "@/utils/format";
 
-const filters = ["挂单", "交易", "开盘", "股票"];
+const filters = ["Orders", "Trades", "Open", "Stocks"];
 
 export default function PortfolioScreen() {
   const live = useLiveHoldings(holdings);
@@ -28,7 +28,7 @@ export default function PortfolioScreen() {
         <View style={{ alignItems: "center", flexDirection: "row", justifyContent: "space-between", gap: spacing.md }}>
           <View style={{ alignItems: "center", flexDirection: "row", flex: 1, gap: spacing.sm }}>
             <Text selectable numberOfLines={1} adjustsFontSizeToFit style={{ color: colors.ink, fontSize: 31, fontWeight: "900" }}>
-              我的投资组合
+              My Portfolio
             </Text>
             <ChevronDown color={colors.ink} size={23} strokeWidth={2.4} />
           </View>
@@ -72,16 +72,16 @@ export default function PortfolioScreen() {
           }}
         >
           <Text selectable style={{ color: colors.muted, fontSize: 18, fontWeight: "900", width: 150 }}>
-            资产 ({live.holdings.length})
+            Assets ({live.holdings.length})
           </Text>
           <Text selectable style={{ color: "#1597e5", fontSize: 18, fontWeight: "900", textAlign: "right", width: 56 }}>
-            变动▲
+            Move ▲
           </Text>
           <Text selectable style={{ color: colors.muted, fontSize: 18, fontWeight: "900", textAlign: "right", width: 76 }}>
-            盈亏
+            P/L
           </Text>
           <Text selectable style={{ color: colors.muted, fontSize: 18, fontWeight: "900", textAlign: "right", width: 76 }}>
-            净值
+            Value
           </Text>
         </View>
 
@@ -93,7 +93,7 @@ export default function PortfolioScreen() {
       <View style={{ alignItems: "center", flexDirection: "row", justifyContent: "space-between", gap: spacing.md }}>
         <View style={{ gap: spacing.xs }}>
           <Text selectable style={{ color: colors.muted, fontSize: 18, fontWeight: "800" }}>
-            可用总余额 ⓘ
+            Available balance ⓘ
           </Text>
           <Text selectable style={{ color: colors.ink, fontSize: 25, fontVariant: ["tabular-nums"], fontWeight: "600" }}>
             {formatCurrency(accountSummary.availableCash)}
@@ -131,7 +131,7 @@ export default function PortfolioScreen() {
             }}
           >
             <Coins color={colors.inverse} size={21} strokeWidth={2.4} />
-            <Text style={{ color: colors.inverse, fontSize: 20, fontWeight: "900" }}>入金</Text>
+            <Text style={{ color: colors.inverse, fontSize: 20, fontWeight: "900" }}>Deposit</Text>
           </GlassSurface>
         </Pressable>
       </View>

@@ -40,7 +40,7 @@ export function HomeValueChart() {
         <View style={{ flexDirection: "row", justifyContent: "space-between", gap: spacing.md }}>
           <View style={{ flex: 1, gap: spacing.xs }}>
             <Text selectable style={{ color: colors.ink, fontSize: 26, fontWeight: "900", lineHeight: 31 }}>
-              欢迎回来!{"\n"}现金及持有物
+              Welcome back!{"\n"}Cash and holdings
             </Text>
             <View style={{ alignItems: "center", flexDirection: "row", gap: spacing.sm }}>
               <Text
@@ -58,7 +58,7 @@ export function HomeValueChart() {
                 {formatSignedCurrency(accountSummary.totalChange)} ({formatPercent(accountSummary.totalChangePercent)})
               </Text>
               <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: "700" }}>
-                今日
+                Today
               </Text>
             </View>
           </View>

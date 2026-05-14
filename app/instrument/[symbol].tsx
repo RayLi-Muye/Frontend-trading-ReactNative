@@ -47,9 +47,9 @@ export default function InstrumentDetailScreen() {
   if (!asset) {
     return (
       <ScreenScroll>
-        <Stack.Screen options={{ title: "市场详情" }} />
+        <Stack.Screen options={{ title: "Market Detail" }} />
         <Text selectable style={{ color: colors.ink, fontSize: 22, fontWeight: "800" }}>
-          该市场暂不可用
+          This market is currently unavailable.
         </Text>
       </ScreenScroll>
     );
@@ -72,10 +72,10 @@ export default function InstrumentDetailScreen() {
         />
         <Stack.Toolbar.Menu accessibilityLabel="More market actions" icon="ellipsis.circle">
           <Stack.Toolbar.MenuAction icon="plus.circle" onPress={() => Haptics.selectionAsync().catch(() => {})}>
-            加入关注
+            Add to Watchlist
           </Stack.Toolbar.MenuAction>
           <Stack.Toolbar.MenuAction icon="chart.line.uptrend.xyaxis" onPress={() => Haptics.selectionAsync().catch(() => {})}>
-            查看深度
+            View Depth
           </Stack.Toolbar.MenuAction>
         </Stack.Toolbar.Menu>
       </Stack.Toolbar>
@@ -127,13 +127,13 @@ export default function InstrumentDetailScreen() {
       />
 
       <Animated.View entering={FadeInUp.delay(90).duration(460).springify()} style={{ flexDirection: "row", gap: spacing.md }}>
-        <StatTile label="做空" value={formatPrice(asset.bid)} />
-        <StatTile label="买入" value={formatPrice(asset.ask)} tone={positive ? "positive" : "negative"} />
+        <StatTile label="Sell" value={formatPrice(asset.bid)} />
+        <StatTile label="Buy" value={formatPrice(asset.ask)} tone={positive ? "positive" : "negative"} />
       </Animated.View>
 
       <Animated.View entering={FadeInUp.delay(160).duration(460).springify()} style={{ flexDirection: "row", gap: spacing.md }}>
-        <StatTile label="点差" value={spread.toFixed(asset.price < 1 ? 4 : 2)} />
-        <StatTile label="今日" value={formatSignedCurrency(asset.change)} tone={positive ? "positive" : "negative"} />
+        <StatTile label="Spread" value={spread.toFixed(asset.price < 1 ? 4 : 2)} />
+        <StatTile label="Today" value={formatSignedCurrency(asset.change)} tone={positive ? "positive" : "negative"} />
       </Animated.View>
 
       <View
@@ -148,7 +148,7 @@ export default function InstrumentDetailScreen() {
       >
         <View style={{ gap: spacing.xs }}>
           <Text selectable style={{ color: colors.inverseMuted, fontSize: 13, fontWeight: "800" }}>
-            估算订单
+            Estimated order
           </Text>
           <Text selectable style={{ color: colors.inverse, fontSize: 22, fontWeight: "900" }}>
             {formatCurrency(1250)}
@@ -156,10 +156,10 @@ export default function InstrumentDetailScreen() {
         </View>
         <View style={{ alignItems: "flex-end", gap: spacing.xs }}>
           <Text selectable style={{ color: colors.inverseMuted, fontSize: 13, fontWeight: "800" }}>
-            市场状态
+            Market status
           </Text>
           <Text selectable style={{ color: colors.brand, fontSize: 22, fontWeight: "900" }}>
-            开盘
+            Open
           </Text>
         </View>
       </View>

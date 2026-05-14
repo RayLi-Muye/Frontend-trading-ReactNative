@@ -11,20 +11,20 @@ import { watchlistAssets } from "@/data/portfolio";
 import { colors, radius, shadows, spacing } from "@/design/theme";
 import { useLiveAssets } from "@/hooks/use-live-market";
 
-const chips = ["全部", "我的投资组合", "开盘", "投资者", "股票"];
+const chips = ["All", "My Portfolio", "Open", "Investors", "Stocks"];
 
 export default function WatchlistScreen() {
   const { assets, pulses } = useLiveAssets(watchlistAssets, { count: 3, intervalMs: 2000, scale: 0.0017 });
 
   return (
     <ScreenScroll includeTopInset bottomInset={118}>
-      <AppHeader searchPlaceholder="搜索" />
+      <AppHeader searchPlaceholder="Search" />
 
       <Animated.View entering={FadeInUp.duration(520).springify()} style={{ gap: spacing.xl }}>
         <View style={{ alignItems: "center", flexDirection: "row", justifyContent: "space-between", gap: spacing.md }}>
           <View style={{ alignItems: "center", flexDirection: "row", flex: 1, gap: spacing.sm }}>
             <Text selectable numberOfLines={1} adjustsFontSizeToFit style={{ color: colors.ink, fontSize: 31, fontWeight: "900" }}>
-              我的关注列表
+              My Watchlist
             </Text>
             <ChevronDown color={colors.ink} size={23} strokeWidth={2.4} />
           </View>
@@ -66,13 +66,13 @@ export default function WatchlistScreen() {
           }}
         >
           <Text selectable style={{ color: colors.muted, fontSize: 17, fontWeight: "800", width: 138 }}>
-            市场
+            Market
           </Text>
           <Text selectable style={{ color: colors.muted, flex: 1, fontSize: 17, fontWeight: "800", textAlign: "center" }}>
-            做空
+            Sell
           </Text>
           <Text selectable style={{ color: colors.muted, flex: 1.05, fontSize: 17, fontWeight: "800", textAlign: "center" }}>
-            买入
+            Buy
           </Text>
         </View>
 
@@ -114,7 +114,7 @@ export default function WatchlistScreen() {
             paddingVertical: spacing.md,
           }}
         >
-          <Text style={{ color: colors.inverse, fontSize: 21, fontWeight: "900" }}>添加</Text>
+          <Text style={{ color: colors.inverse, fontSize: 21, fontWeight: "900" }}>Add</Text>
           <Plus color={colors.inverse} size={27} strokeWidth={2.4} />
         </GlassSurface>
       </Pressable>

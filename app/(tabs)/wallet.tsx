@@ -14,7 +14,7 @@ import { formatCurrency } from "@/utils/format";
 export default function WalletScreen() {
   return (
     <ScreenScroll includeTopInset bottomInset={118}>
-      <AppHeader searchPlaceholder="搜索" />
+      <AppHeader searchPlaceholder="Search" />
 
       <AccountSummaryCard />
 
@@ -30,10 +30,10 @@ export default function WalletScreen() {
       >
         <View style={{ flex: 1, gap: spacing.sm }}>
           <Text selectable style={{ color: colors.ink, fontSize: 23, fontWeight: "900", lineHeight: 29 }}>
-            入金后立即管理持仓
+            Fund once, manage every position
           </Text>
           <Text selectable style={{ color: colors.muted, fontSize: 16, fontWeight: "600", lineHeight: 23 }}>
-            资金、投资账户和可用余额在同一处更新。
+            Cash, investment accounts, and available balances update in one place.
           </Text>
           <Pressable
             accessibilityRole="button"
@@ -49,7 +49,7 @@ export default function WalletScreen() {
               paddingVertical: spacing.sm,
             })}
           >
-            <Text style={{ color: colors.inverse, fontSize: 17, fontWeight: "900" }}>开始使用</Text>
+            <Text style={{ color: colors.inverse, fontSize: 17, fontWeight: "900" }}>Get started</Text>
           </Pressable>
         </View>
 
@@ -99,10 +99,10 @@ export default function WalletScreen() {
 
             <View style={{ flex: 1, justifyContent: "center", minWidth: 0 }}>
               <Text selectable style={{ color: colors.ink, fontSize: 20, fontWeight: "900" }}>
-                {account.code} 账户
+                {account.code} Account
               </Text>
               <Text selectable style={{ color: colors.muted, fontSize: 14, fontWeight: "600" }}>
-                可用 {formatCurrency(account.available)}
+                Available {formatCurrency(account.available)}
               </Text>
             </View>
 
@@ -144,7 +144,7 @@ export default function WalletScreen() {
           })}
         >
           <Landmark color={colors.ink} size={20} strokeWidth={2.3} />
-          <Text style={{ color: colors.ink, fontSize: 17, fontWeight: "900" }}>增资</Text>
+          <Text style={{ color: colors.ink, fontSize: 17, fontWeight: "900" }}>Fund</Text>
         </Pressable>
 
         <Pressable
@@ -165,7 +165,7 @@ export default function WalletScreen() {
           })}
         >
           <ArrowRightLeft color={colors.inverse} size={20} strokeWidth={2.3} />
-          <Text style={{ color: colors.inverse, fontSize: 17, fontWeight: "900" }}>转账</Text>
+          <Text style={{ color: colors.inverse, fontSize: 17, fontWeight: "900" }}>Transfer</Text>
           <Plus color={colors.inverse} size={22} strokeWidth={2.3} />
         </Pressable>
       </View>

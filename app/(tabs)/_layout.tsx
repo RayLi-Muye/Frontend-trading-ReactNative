@@ -42,7 +42,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "主页",
+          title: "Home",
           tabBarIcon: ({ color, focused }) => (
             <House color={color} size={focused ? 25 : 23} strokeWidth={2.4} />
           ),
@@ -51,7 +51,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="portfolio"
         options={{
-          title: "我的投资",
+          title: "Investments",
           tabBarIcon: ({ color, focused }) => (
             <ChartPie color={color} size={focused ? 25 : 23} strokeWidth={2.4} />
           ),
@@ -60,7 +60,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="watchlist"
         options={{
-          title: "关注列表",
+          title: "Watchlist",
           tabBarIcon: ({ color, focused }) => (
             <Eye color={color} size={focused ? 25 : 23} strokeWidth={2.4} />
           ),
@@ -69,7 +69,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="wallet"
         options={{
-          title: "钱包",
+          title: "Wallet",
           tabBarIcon: ({ color, focused }) => (
             <Wallet color={color} size={focused ? 25 : 23} strokeWidth={2.4} />
           ),

@@ -23,22 +23,22 @@ export default function NativeTabLayout() {
     >
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Icon sf={{ default: "house", selected: "house.fill" }} md="home" />
-        <NativeTabs.Trigger.Label>主页</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="portfolio">
         <NativeTabs.Trigger.Icon sf={{ default: "chart.pie", selected: "chart.pie.fill" }} md="pie_chart" />
-        <NativeTabs.Trigger.Label>我的投资</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>Investments</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="watchlist">
         <NativeTabs.Trigger.Icon sf={{ default: "eye", selected: "eye.fill" }} md="visibility" />
-        <NativeTabs.Trigger.Label>关注列表</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>Watchlist</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger name="wallet">
         <NativeTabs.Trigger.Icon sf={{ default: "wallet.pass", selected: "wallet.pass.fill" }} md="wallet" />
-        <NativeTabs.Trigger.Label>钱包</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>Wallet</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Badge hidden />
       </NativeTabs.Trigger>
     </NativeTabs>

@@ -24,7 +24,7 @@ export function MoverCard() {
       <View style={{ alignItems: "center", flexDirection: "row", justifyContent: "space-between" }}>
         <View style={{ alignItems: "center", flexDirection: "row", gap: spacing.sm }}>
           <Text selectable style={{ color: colors.ink, fontSize: 25, fontWeight: "900" }}>
-            大幅波动股
+            Top movers
           </Text>
           <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: "700" }}>
             i

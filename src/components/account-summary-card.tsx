@@ -22,7 +22,7 @@ export function AccountSummaryCard() {
       <View style={{ gap: spacing.sm }}>
         <View style={{ alignItems: "center", flexDirection: "row", justifyContent: "space-between", gap: spacing.md }}>
           <Text selectable style={{ color: colors.ink, fontSize: 22, fontWeight: "800" }}>
-            您的总价值
+            Total value
           </Text>
 
           <View
@@ -54,7 +54,7 @@ export function AccountSummaryCard() {
           {formatCurrency(accountSummary.totalValue)}
         </Text>
         <Text selectable style={{ color: colors.muted, fontSize: 14, fontVariant: ["tabular-nums"], fontWeight: "600" }}>
-          上次更新时间为 {accountSummary.lastUpdated}
+          Last updated at {accountSummary.lastUpdated}
         </Text>
       </View>
 
@@ -66,7 +66,7 @@ export function AccountSummaryCard() {
           100%
         </Text>
         <Text selectable style={{ color: colors.muted, fontSize: 17, fontWeight: "700" }}>
-          投资账户
+          Investment account
         </Text>
       </View>
     </GlassSurface>
