@@ -1,0 +1,15 @@
+{
+  "buildCommand": "npx expo export --platform web",
+  "outputDirectory": "dist",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/instrument/:symbol",
+      "destination": "/instrument/[symbol].html"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
+    }
+  ]
+}

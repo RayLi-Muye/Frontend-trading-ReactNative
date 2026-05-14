@@ -152,6 +152,13 @@ Recommended stack:
 - Expo web build for shareable demo deployment.
 - Vercel for live email link.
 - Figma for wireframes, tokens, and prototype flow.
+- API routes are not needed for the current mock-data phase.
+
+API route decision:
+
+- Do not add `app/api/*+api.ts` while data is static and client-safe.
+- Add Expo API routes only if the demo later proxies a real market API, hides server-side secrets, validates writes, or needs webhook/rate-limit behavior.
+- If API routes are added later, keep them focused, typed, and deployable to EAS Hosting's Cloudflare Workers runtime.
 
 Implementation principles:
 
@@ -185,4 +192,4 @@ Secondary options:
 - Final repo visibility: currently private during build; make public or invite reviewers later for interview review.
 - Whether the deployed app should use a neutral name like `Market Pulse Demo` to avoid brand confusion.
 - Whether to include generated visual assets or use abstract chart/product visuals.
-- Chart library choice after Expo scaffold is created.
+- Whether to keep the custom SVG sparkline or adopt a chart library for richer interactions later.

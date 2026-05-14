@@ -9,9 +9,26 @@ This repository is being prepared as an interview demonstration. The app will us
 - Repository scaffold: created and pushed to private GitHub repo
 - Design brief: drafted in `docs/eightcap-mobile-demo-brief.md`
 - Prompt and command log: started in `docs/prompt-command-log.md`
-- App implementation: not started yet
+- App implementation: Expo Router + TypeScript first pass is running locally
+- Data source: local mock data only
+- API routes: intentionally not used in this phase
 
-## Planned Presentation Format
+## Run Locally
+
+```bash
+npm install
+npm run web
+```
+
+The current dev server was verified at:
+
+```text
+http://localhost:8082
+```
+
+Port `8081` was already occupied on this machine, so `8082` was used for verification.
+
+## Presentation Format
 
 The strongest interview package should include:
 
@@ -32,22 +49,48 @@ This is a portfolio demo only. It should be described as "inspired by Eightcap's
 
 ```text
 .
+├── app/                    Expo Router screens
+│   ├── (tabs)/             Markets, Watchlist, Insights
+│   ├── instrument/         Dynamic instrument detail route
+│   └── disclaimer.tsx      Demo boundary and risk notice
+├── assets/                 Expo app assets
+├── src/
+│   ├── components/         Reusable UI components
+│   ├── data/               Mock market data
+│   ├── design/             Design tokens
+│   └── utils/              Formatting helpers
 ├── README.md
 ├── docs/
 │   ├── eightcap-mobile-demo-brief.md
 │   ├── figma-wireframe-brief.md
 │   └── prompt-command-log.md
+├── package.json
+├── tsconfig.json
 └── .gitignore
 ```
 
-The Expo app source will be added after the design direction is agreed:
+## Implemented Screens
 
-```text
-app/                 Expo Router screens
-src/components/      Reusable UI components
-src/data/            Mock market data
-src/design/          Design tokens and theme helpers
-src/features/        Feature-level modules
-src/utils/           Formatting and shared utilities
-assets/              Images, icons, and generated visuals
+- Markets dashboard with category filters, summary tiles, instrument rows, and sparklines.
+- Instrument detail screen with chart range controls, stats, and mock insight copy.
+- Watchlist tab with sorting modes.
+- Insights tab with knowledge-hub style cards.
+- Demo notice modal clarifying that all data is mocked and the project is not affiliated with Eightcap.
+
+## Verification
+
+```bash
+npm run typecheck
+npx expo export --platform web
 ```
+
+Browser verification covered:
+
+- `http://localhost:8082/`
+- `http://localhost:8082/instrument/XAUUSD`
+- `http://localhost:8082/watchlist`
+- `http://localhost:8082/insights`
+
+Static web export was also verified and generated `dist/`, which is ignored by Git and can be used as the Vercel output later.
+
+`vercel.json` is included so Vercel can run the Expo web export and serve dynamic instrument detail URLs.

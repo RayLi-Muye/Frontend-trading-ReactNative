@@ -15,6 +15,8 @@ The user requested a React Native interview demonstration inspired by https://ww
 
 ## Commands Run
 
+### Repository And Research
+
 ```bash
 pwd
 rg --files -g '!*node_modules*' -g '!*.png' -g '!*.jpg' -g '!*.jpeg' -g '!*.gif' -g '!*.mp4' | head -200
@@ -45,6 +47,43 @@ git remote -v
 gh repo view RayLi-Muye/Demo-EightCap --json nameWithOwner,url,visibility,description,defaultBranchRef
 ```
 
+### Expo Scaffold And Implementation
+
+```bash
+sed -n '1,240p' /Users/winnie/.agents/skills/expo-api-routes/SKILL.md
+sed -n '1,220p' /Users/winnie/.agents/skills/building-native-ui/SKILL.md
+node --version
+npm --version
+npx create-expo-app@latest --help
+rm -rf /tmp/demo-eightcap-expo-scaffold && npx create-expo-app@latest /tmp/demo-eightcap-expo-scaffold --template tabs
+cp -R /tmp/demo-eightcap-expo-scaffold/app /tmp/demo-eightcap-expo-scaffold/assets /tmp/demo-eightcap-expo-scaffold/app.json /tmp/demo-eightcap-expo-scaffold/package.json /tmp/demo-eightcap-expo-scaffold/package-lock.json /tmp/demo-eightcap-expo-scaffold/tsconfig.json .
+npm install
+npx expo install react-native-svg expo-haptics
+npm install lucide-react-native
+mkdir -p app/instrument src/components src/data src/design src/utils
+npm install
+npm run typecheck
+npx expo start --web --port 8081 --non-interactive
+CI=1 npx expo start --web --port 8082
+npx expo export --platform web
+```
+
+### Verification
+
+```bash
+npm run typecheck
+npx expo export --platform web
+```
+
+The web app was opened and checked in the Codex in-app browser at:
+
+```text
+http://localhost:8082/
+http://localhost:8082/instrument/XAUUSD
+http://localhost:8082/watchlist
+http://localhost:8082/insights
+```
+
 ## Notes
 
 - `gh auth status` showed GitHub CLI is authenticated as `RayLi-Muye`.
@@ -53,6 +92,13 @@ gh repo view RayLi-Muye/Demo-EightCap --json nameWithOwner,url,visibility,descri
 - One CSS variable extraction command failed because the pattern began with `--`; it should use `rg -- 'pattern'` if repeated.
 - A private GitHub repository was created at https://github.com/RayLi-Muye/Demo-EightCap.
 - The local `main` branch tracks `origin/main`.
+- The project uses Expo Router with `app/` routes and keeps reusable components/data/tokens under `src/`.
+- `expo-api-routes` was reviewed. API routes are intentionally skipped for now because this version uses static mock data and has no server-side secrets.
+- Port `8081` was already in use by another local project, so Expo web verification used `http://localhost:8082`.
+- `npm run typecheck` passed.
+- `npx expo export --platform web` passed and generated `dist/`.
+- `vercel.json` was added with Expo web build/output settings and a rewrite for `/instrument/:symbol`.
+- `npm audit` currently reports 4 moderate issues from the generated Expo dependency tree; no forced audit fix was run because it may introduce breaking changes.
 
 ## Future Prompt Templates
 
