@@ -5,9 +5,9 @@ import { colors } from "@/design/theme";
 export default function NativeTabLayout() {
   return (
     <NativeTabs
-      backgroundColor="rgba(255,255,255,0.82)"
+      backgroundColor="transparent"
       badgeBackgroundColor="#cf241b"
-      blurEffect="systemMaterialLight"
+      blurEffect="systemUltraThinMaterial"
       disableTransparentOnScrollEdge
       iconColor={{ default: colors.muted, selected: colors.brandAction }}
       indicatorColor="rgba(5,184,63,0.18)"
@@ -18,7 +18,7 @@ export default function NativeTabLayout() {
       labelVisibilityMode="labeled"
       minimizeBehavior="onScrollDown"
       rippleColor="rgba(5,184,63,0.14)"
-      shadowColor="rgba(8, 11, 18, 0.10)"
+      shadowColor="rgba(8, 11, 18, 0.08)"
       tintColor={colors.brandAction}
     >
       <NativeTabs.Trigger name="index">

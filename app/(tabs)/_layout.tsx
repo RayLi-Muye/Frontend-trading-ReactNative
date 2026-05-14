@@ -13,10 +13,10 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.muted,
         tabBarBackground: () => (
           <BlurView
-            tint="systemMaterial"
-            intensity={74}
+            tint="systemUltraThinMaterial"
+            intensity={96}
             style={{
-              backgroundColor: "rgba(255,255,255,0.82)",
+              backgroundColor: "rgba(255,255,255,0.34)",
               flex: 1,
             }}
           />
@@ -28,14 +28,14 @@ export default function TabLayout() {
         tabBarLabelStyle: { fontSize: 12, fontWeight: "700" },
         tabBarLabelPosition: "below-icon",
         tabBarStyle: {
-          backgroundColor: "rgba(255,255,255,0.78)",
-          borderTopColor: "rgba(230,234,240,0.78)",
+          backgroundColor: "rgba(255,255,255,0.28)",
+          borderTopColor: "rgba(255,255,255,0.42)",
           height: 88,
           overflow: "hidden",
           paddingBottom: 22,
           paddingTop: 8,
           position: "absolute",
-          boxShadow: "0 -14px 32px rgba(8, 11, 18, 0.08)",
+          boxShadow: "0 -18px 36px rgba(8, 11, 18, 0.10)",
         },
       }}
     >
