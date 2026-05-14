@@ -1,5 +1,5 @@
 export const colors = {
-  canvas: "#f8f9f5",
+  canvas: "#f5f8f4",
   surface: "#ffffff",
   surfaceAlt: "#f1f3ef",
   ink: "#080b12",

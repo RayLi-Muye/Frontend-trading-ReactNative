@@ -63,12 +63,12 @@ export function HoldingRow({ holding, pulse }: HoldingRowProps) {
         }}
       >
         <Animated.View
-          pointerEvents="none"
           style={[
             {
               backgroundColor: pulse?.direction === "down" ? "rgba(255,47,61,0.12)" : "rgba(13,187,79,0.12)",
               bottom: 0,
               left: 0,
+              pointerEvents: "none",
               position: "absolute",
               right: 0,
               top: 0,

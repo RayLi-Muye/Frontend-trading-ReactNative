@@ -1,54 +1,84 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Text, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 
 import { marketIndexes } from "@/data/portfolio";
 import { useLiveIndexes } from "@/hooks/use-live-market";
 import { colors, spacing } from "@/design/theme";
-import { formatPercent, formatPrice } from "@/utils/format";
+import { formatPercent } from "@/utils/format";
 
-const ITEM_WIDTH = 144;
+const ITEM_WIDTH = 118;
+const PRICE_WIDTH = 94;
+const LOOP_DURATION_PER_ITEM = 3200;
+
+function formatIndexPrice(value: number) {
+  return value.toLocaleString("en-US", {
+    maximumFractionDigits: value >= 1000 ? 1 : 2,
+    minimumFractionDigits: value >= 1000 ? 1 : 2,
+  });
+}
 
 export function MarketIndexStrip() {
   const indexes = useLiveIndexes(marketIndexes);
   const translateX = useSharedValue(0);
-  const trackWidth = indexes.length * ITEM_WIDTH;
+  const loopWidth = marketIndexes.length * ITEM_WIDTH;
 
   useEffect(() => {
+    translateX.value = 0;
     translateX.value = withRepeat(
-      withTiming(-trackWidth, { duration: 18000, easing: Easing.linear }),
+      withTiming(-loopWidth, { duration: marketIndexes.length * LOOP_DURATION_PER_ITEM, easing: Easing.linear }),
       -1,
       false,
     );
-  }, [trackWidth, translateX]);
+  }, [loopWidth, translateX]);
 
   const tickerStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
   }));
 
-  const tickerItems = [...indexes, ...indexes, ...indexes];
+  const tickerItems = useMemo(() => [...indexes, ...indexes], [indexes]);
 
   return (
     <View style={{ marginHorizontal: -spacing.lg, overflow: "hidden", paddingVertical: spacing.xs }}>
-      <Animated.View style={[{ flexDirection: "row", paddingLeft: spacing.lg }, tickerStyle]}>
+      <Animated.View style={[{ flexDirection: "row", width: loopWidth * 2 }, tickerStyle]}>
         {tickerItems.map((index, itemIndex) => (
           <View
             key={`${index.symbol}-${itemIndex}`}
             style={{
               borderLeftColor: colors.line,
               borderLeftWidth: 1,
-              minWidth: ITEM_WIDTH,
               gap: 2,
-              paddingHorizontal: spacing.lg,
+              paddingHorizontal: 10,
+              width: ITEM_WIDTH,
             }}
           >
-            <Text selectable style={{ color: colors.muted, fontSize: 14, fontWeight: "900" }}>
+            <Text numberOfLines={1} selectable style={{ color: colors.muted, fontSize: 12, fontWeight: "900" }}>
               {index.symbol}
             </Text>
-            <Text selectable style={{ color: colors.ink, fontSize: 23, fontVariant: ["tabular-nums"], fontWeight: "900" }}>
-              {formatPrice(index.value)}
+            <Text
+              numberOfLines={1}
+              selectable
+              style={{
+                color: colors.ink,
+                fontSize: 19,
+                fontVariant: ["tabular-nums"],
+                fontWeight: "900",
+                width: PRICE_WIDTH,
+              }}
+            >
+              {formatIndexPrice(index.value)}
             </Text>
-            <Text selectable style={{ color: colors.positive, fontSize: 16, fontVariant: ["tabular-nums"], fontWeight: "700" }}>
+            <Text
+              numberOfLines={1}
+              selectable
+              style={{
+                color: index.changePercent >= 0 ? colors.positive : colors.negative,
+                fontSize: 13,
+                fontVariant: ["tabular-nums"],
+                fontWeight: "700",
+                width: PRICE_WIDTH,
+              }}
+            >
               {formatPercent(index.changePercent)}
             </Text>
           </View>

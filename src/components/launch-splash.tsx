@@ -1,4 +1,4 @@
-import { BlurView } from "expo-blur";
+import { ArrowRight } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import Animated, {
@@ -8,171 +8,166 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import Svg, { Text as SvgText } from "react-native-svg";
 
-import { colors } from "@/design/theme";
+const ASCII_COLUMNS = 82;
+const ASCII_ROWS = 50;
+const BRAND_GREEN = "#2DBB69";
 
-const CORE_GLYPHS = "00112233445566778899";
-const EDGE_GLYPHS = "..::--++==";
-const START_TILT_RADIANS = (-24 * Math.PI) / 180;
-
-type CloudPoint = {
-  char: string;
-  phase: number;
-  weight: number;
-  x: number;
-  y: number;
-  z: number;
+type SplashRequest = {
+  autoHide: boolean;
 };
 
-type ProjectedPoint = CloudPoint & {
-  color: string;
-  fontSize: number;
-  opacity: number;
-  screenX: number;
-  screenY: number;
-};
+const splashListeners = new Set<(request: SplashRequest) => void>();
 
-function random(seed: number) {
-  const value = Math.sin(seed * 12.9898) * 43758.5453;
-  return value - Math.floor(value);
-}
-
-function chooseGlyph(seed: number, weight: number) {
-  const source = weight > 0.36 ? CORE_GLYPHS : EDGE_GLYPHS;
-  return source[Math.floor(random(seed) * source.length)];
+export function showLaunchSplash(autoHide = false) {
+  splashListeners.forEach((listener) => listener({ autoHide }));
 }
 
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
-function mix(from: number, to: number, amount: number) {
-  return Math.round(from + (to - from) * amount);
+function getEightCenterline(angle: number) {
+  const x = 4.5 * Math.sin(angle) * Math.cos(angle);
+  const y = 6.5 * Math.cos(angle);
+  const z = 1.1 * Math.sin(angle);
+
+  return [x, y, z] as const;
 }
 
-function greenTone(depth: number, shimmer: number) {
-  const amount = clamp(0.28 + depth * 0.5 + shimmer * 0.22, 0, 1);
-  return `rgb(${mix(5, 67, amount)}, ${mix(158, 225, amount)}, ${mix(76, 126, amount)})`;
-}
+function buildAsciiEightFrame(frame: number) {
+  const time = frame * 0.02;
+  const glyphs = new Array<string>(ASCII_COLUMNS * ASCII_ROWS).fill(" ");
+  const depth = new Array<number>(ASCII_COLUMNS * ASCII_ROWS).fill(0);
 
-function createEightCloud() {
-  const points: CloudPoint[] = [];
-  const cols = 40;
-  const rows = 58;
+  const tiltZ = -Math.PI / 7.5;
+  const tiltX = Math.PI / 32;
+  const swingY = Math.sin(time) * 0.45;
+  const cosZ = Math.cos(tiltZ);
+  const sinZ = Math.sin(tiltZ);
+  const cosX = Math.cos(tiltX);
+  const sinX = Math.sin(tiltX);
+  const cosY = Math.cos(swingY);
+  const sinY = Math.sin(swingY);
+  const tubeRadius = 0.7;
+  const cameraDistance = 18;
+  const projectionX = 72;
+  const projectionY = 42;
 
-  for (let row = 0; row < rows; row += 1) {
-    for (let col = 0; col < cols; col += 1) {
-      const seed = row * 173 + col * 97 + 13;
-      const x = -0.82 + (col / (cols - 1)) * 1.64;
-      const y = -0.96 + (row / (rows - 1)) * 1.92;
+  for (let pathAngle = 0; pathAngle < Math.PI * 2; pathAngle += 0.03) {
+    const [centerX, centerY, centerZ] = getEightCenterline(pathAngle);
+    const [nextX, nextY, nextZ] = getEightCenterline(pathAngle + 0.01);
+    let tangentX = nextX - centerX;
+    let tangentY = nextY - centerY;
+    let tangentZ = nextZ - centerZ;
+    const tangentLength = Math.sqrt(tangentX * tangentX + tangentY * tangentY + tangentZ * tangentZ);
 
-      const topOuter = (x / 0.56) ** 2 + ((y + 0.36) / 0.43) ** 2;
-      const bottomOuter = (x / 0.64) ** 2 + ((y - 0.34) / 0.52) ** 2;
-      const topInner = (x / 0.29) ** 2 + ((y + 0.36) / 0.22) ** 2;
-      const bottomInner = (x / 0.34) ** 2 + ((y - 0.34) / 0.28) ** 2;
-      const topBand = topOuter < 1 && topInner > 1;
-      const bottomBand = bottomOuter < 1 && bottomInner > 1;
-      const bridge = Math.abs(x) < 0.19 && y > -0.19 && y < 0.18;
-      const edge = (topOuter < 1.08 && topInner > 0.88) || (bottomOuter < 1.07 && bottomInner > 0.9);
+    tangentX /= tangentLength;
+    tangentY /= tangentLength;
+    tangentZ /= tangentLength;
 
-      if (!topBand && !bottomBand && !bridge && !edge) {
+    let axisX = 0;
+    let axisY = 1;
+    let axisZ = 0;
+
+    if (Math.abs(tangentY) > 0.95) {
+      axisX = 1;
+      axisY = 0;
+      axisZ = 0;
+    }
+
+    let normalX = tangentY * axisZ - tangentZ * axisY;
+    let normalY = tangentZ * axisX - tangentX * axisZ;
+    let normalZ = tangentX * axisY - tangentY * axisX;
+    const normalLength = Math.sqrt(normalX * normalX + normalY * normalY + normalZ * normalZ);
+
+    normalX /= normalLength;
+    normalY /= normalLength;
+    normalZ /= normalLength;
+
+    const binormalX = normalY * tangentZ - normalZ * tangentY;
+    const binormalY = normalZ * tangentX - normalX * tangentZ;
+    const binormalZ = normalX * tangentY - normalY * tangentX;
+
+    for (let tubeAngle = 0; tubeAngle < Math.PI * 2; tubeAngle += 0.1) {
+      const ringCos = Math.cos(tubeAngle);
+      const ringSin = Math.sin(tubeAngle);
+      const surfaceX = ringCos * binormalX + ringSin * normalX;
+      const surfaceY = ringCos * binormalY + ringSin * normalY;
+      const surfaceZ = ringCos * binormalZ + ringSin * normalZ;
+      const modelX = centerX + tubeRadius * surfaceX;
+      const modelY = centerY + tubeRadius * surfaceY;
+      const modelZ = centerZ + tubeRadius * surfaceZ;
+
+      const zRotatedX = modelX * cosZ - modelY * sinZ;
+      const zRotatedY = modelX * sinZ + modelY * cosZ;
+      const xRotatedY = zRotatedY * cosX - modelZ * sinX;
+      const xRotatedZ = zRotatedY * sinX + modelZ * cosX;
+      const yRotatedX = zRotatedX * cosY + xRotatedZ * sinY;
+      const yRotatedZ = -zRotatedX * sinY + xRotatedZ * cosY;
+
+      const normalZRotatedX = surfaceX * cosZ - surfaceY * sinZ;
+      const normalZRotatedY = surfaceX * sinZ + surfaceY * cosZ;
+      const normalXRotatedY = normalZRotatedY * cosX - surfaceZ * sinX;
+      const normalXRotatedZ = normalZRotatedY * sinX + surfaceZ * cosX;
+      const normalYRotatedZ = -normalZRotatedX * sinY + normalXRotatedZ * cosY;
+      const luminance = (normalXRotatedY * 0.8 - normalYRotatedZ * 0.6 + 1) / 2;
+
+      const perspective = 1 / (cameraDistance + yRotatedZ);
+      const screenX = Math.floor(ASCII_COLUMNS / 2 + projectionX * perspective * yRotatedX);
+      const screenY = Math.floor(ASCII_ROWS / 2 - projectionY * perspective * xRotatedY);
+
+      if (screenX < 0 || screenX >= ASCII_COLUMNS || screenY < 0 || screenY >= ASCII_ROWS) {
         continue;
       }
 
-      const jitterX = (random(seed + 1) - 0.5) * 0.018;
-      const jitterY = (random(seed + 2) - 0.5) * 0.018;
-      const ringEnergy = Math.min(Math.abs(topOuter - 0.68), Math.abs(bottomOuter - 0.67));
-      const weight = clamp((topBand || bottomBand || bridge ? 0.68 : 0.34) + (0.22 - ringEnergy) + random(seed + 3) * 0.16, 0, 1);
+      const index = screenX + screenY * ASCII_COLUMNS;
 
-      points.push({
-        char: chooseGlyph(seed + 4, weight),
-        phase: random(seed + 5) * Math.PI * 2,
-        weight,
-        x: x + jitterX,
-        y: y + jitterY,
-        z: Math.sin(x * 4.2 + y * 1.8) * 0.11 + (random(seed + 6) - 0.5) * 0.14,
-      });
+      if (perspective <= depth[index]) {
+        continue;
+      }
+
+      depth[index] = perspective;
+      glyphs[index] =
+        luminance > 0.75
+          ? "1"
+          : luminance > 0.5
+            ? (screenX + screenY) % 2 === 0
+              ? "1"
+              : "0"
+            : luminance > 0.25
+              ? (screenX + screenY) % 3 === 0
+                ? "1"
+                : "0"
+              : "0";
     }
   }
 
-  return points;
-}
+  let output = "";
 
-function rotatePoint(point: CloudPoint, time: number) {
-  const wave = Math.sin(time * 0.9 + point.phase) * 0.018;
-  let x = point.x + wave;
-  let y = point.y + Math.cos(time * 0.72 + point.phase) * 0.014;
-  let z = point.z + Math.sin(time * 1.1 + point.phase) * 0.025;
+  for (let row = 0; row < ASCII_ROWS; row += 1) {
+    output += `${glyphs.slice(row * ASCII_COLUMNS, (row + 1) * ASCII_COLUMNS).join("")}\n`;
+  }
 
-  const rotX = Math.sin(time * 0.65) * 0.2;
-  const rotY = Math.sin(time * 0.48 + 1.1) * 0.26;
-  const rotZ = START_TILT_RADIANS + Math.sin(time * 0.36) * 0.08;
-
-  const cosX = Math.cos(rotX);
-  const sinX = Math.sin(rotX);
-  const y1 = y * cosX - z * sinX;
-  const z1 = y * sinX + z * cosX;
-  y = y1;
-  z = z1;
-
-  const cosY = Math.cos(rotY);
-  const sinY = Math.sin(rotY);
-  const x1 = x * cosY + z * sinY;
-  const z2 = -x * sinY + z * cosY;
-  x = x1;
-  z = z2;
-
-  const cosZ = Math.cos(rotZ);
-  const sinZ = Math.sin(rotZ);
-
-  return {
-    x: x * cosZ - y * sinZ,
-    y: x * sinZ + y * cosZ,
-    z,
-  };
-}
-
-function projectCloud(points: CloudPoint[], frame: number, width: number, height: number) {
-  const time = frame / 30;
-  const scale = Math.min(width * 0.52, height * 0.56);
-  const centerX = width / 2;
-  const centerY = height / 2 + 8;
-  const cameraDistance = 2.8;
-
-  return points
-    .map((point) => {
-      const rotated = rotatePoint(point, time);
-      const depth = clamp((rotated.z + 0.85) / 1.7, 0, 1);
-      const perspective = cameraDistance / (cameraDistance - rotated.z);
-      const shimmer = (Math.sin(time * 3.2 + point.phase) + 1) / 2;
-      const opacity = clamp(0.18 + depth * 0.48 + point.weight * 0.28 + shimmer * 0.08, 0.16, 0.98);
-
-      return {
-        ...point,
-        color: greenTone(depth, shimmer),
-        fontSize: clamp(10.5 + perspective * 4 + point.weight * 2.5, 10, 18),
-        opacity,
-        screenX: centerX + rotated.x * scale * perspective,
-        screenY: centerY + rotated.y * scale * perspective,
-        z: rotated.z,
-      };
-    })
-    .sort((a, b) => a.z - b.z);
+  return output;
 }
 
 export function LaunchSplash() {
   const [frame, setFrame] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [autoHide, setAutoHide] = useState(false);
   const { height, width } = useWindowDimensions();
   const fade = useSharedValue(1);
-  const points = useMemo(createEightCloud, []);
-  const stageWidth = width;
-  const stageHeight = Math.max(360, height - 184);
-  const projectedPoints = useMemo(
-    () => projectCloud(points, frame, stageWidth, stageHeight),
-    [frame, points, stageHeight, stageWidth],
-  );
+  const asciiFrame = useMemo(() => buildAsciiEightFrame(frame), [frame]);
+  const asciiFontSize =
+    width < 600
+      ? clamp(Math.min(height * 0.013, width * 0.023), 8, 12)
+      : clamp(Math.min(height * 0.018, width * 0.018), 12, 16);
+  const stageScale = (width < 390 ? 0.9 : 1) * 1.56;
+  const stageOffsetX = -width * 0.05;
+  const stageOffsetY = width < 600 ? 0 : 72;
+  const asciiTextWidth = ASCII_COLUMNS * (asciiFontSize + 2);
+  const asciiTextHeight = ASCII_ROWS * asciiFontSize * 1.1;
 
   useEffect(() => {
     let frameId = 0;
@@ -195,12 +190,30 @@ export function LaunchSplash() {
   }, []);
 
   useEffect(() => {
+    function show(request: SplashRequest) {
+      fade.value = 1;
+      setAutoHide(request.autoHide);
+      setIsVisible(true);
+    }
+
+    splashListeners.add(show);
+
+    return () => {
+      splashListeners.delete(show);
+    };
+  }, [fade]);
+
+  useEffect(() => {
+    if (!autoHide) {
+      return undefined;
+    }
+
     const timer = setTimeout(() => {
       setIsVisible(false);
     }, 2600);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [autoHide]);
 
   function enterApp() {
     fade.value = withTiming(0, { duration: 460, easing: Easing.inOut(Easing.cubic) }, (finished) => {
@@ -220,131 +233,131 @@ export function LaunchSplash() {
 
   return (
     <Animated.View accessibilityViewIsModal style={[StyleSheet.absoluteFillObject, styles.root, containerStyle]}>
-      <View style={[styles.corner, styles.cornerTopLeft]} />
-      <View style={[styles.corner, styles.cornerTopRight]} />
-      <View style={[styles.corner, styles.cornerBottomLeft]} />
-      <View style={[styles.corner, styles.cornerBottomRight]} />
-
-      <Text style={styles.title}>EightCap-Frontend Prototype</Text>
-
-      <View style={[styles.characterStage, { height: stageHeight }]}>
-        <Svg height={stageHeight} width={stageWidth}>
-          {projectedPoints.map((point, index) => (
-            <SvgText
-              key={`${index}-${point.phase}`}
-              fill={point.color}
-              fontFamily="Courier"
-              fontSize={point.fontSize}
-              fontWeight="700"
-              opacity={point.opacity}
-              textAnchor="middle"
-              x={point.screenX}
-              y={point.screenY}
-            >
-              {point.char}
-            </SvgText>
-          ))}
-        </Svg>
+      <View pointerEvents="none" style={styles.asciiLayer}>
+        <Text
+          selectable={false}
+          style={[
+            styles.asciiText,
+            {
+              fontSize: asciiFontSize,
+              height: asciiTextHeight,
+              lineHeight: asciiFontSize * 1.1,
+              transform: [{ translateX: stageOffsetX }, { translateY: stageOffsetY }, { scale: stageScale }],
+              width: asciiTextWidth,
+            },
+          ]}
+        >
+          {asciiFrame}
+        </Text>
       </View>
 
-      <Pressable
-        accessibilityLabel="Enter main interface"
-        accessibilityRole="button"
-        onPress={enterApp}
-        style={({ pressed }) => [styles.enterButton, pressed && styles.enterButtonPressed]}
-      >
-        <BlurView intensity={54} tint="light" style={styles.buttonBlur}>
-          <Text style={styles.enterButtonText}>Enter Prototype</Text>
-        </BlurView>
-      </Pressable>
+      <View pointerEvents="box-none" style={styles.contentLayer}>
+        <View style={styles.titleWrap}>
+          <Text style={styles.title}>
+            Eight Cap <Text style={styles.titleStrong}>prototype</Text>
+          </Text>
+          <View style={styles.titleRule} />
+        </View>
+
+        <Pressable
+          accessibilityLabel="Enter main interface"
+          accessibilityRole="button"
+          onPress={enterApp}
+          style={({ pressed }) => [styles.enterButton, pressed && styles.enterButtonPressed]}
+        >
+          <View style={styles.buttonContent}>
+            <Text style={styles.enterButtonText}>Enter App</Text>
+            <ArrowRight color="#FFFFFF" size={20} strokeWidth={2.4} />
+          </View>
+        </Pressable>
+      </View>
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  buttonBlur: {
+  asciiLayer: {
+    ...StyleSheet.absoluteFillObject,
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.42)",
-    borderColor: "rgba(255, 255, 255, 0.68)",
-    borderRadius: 26,
-    borderWidth: 1,
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  asciiText: {
+    color: BRAND_GREEN,
+    fontFamily: "Courier",
+    fontWeight: "800",
+    includeFontPadding: false,
+    letterSpacing: 1.1,
+    opacity: 0.9,
+    textAlign: "center",
+  },
+  buttonContent: {
+    alignItems: "center",
+    backgroundColor: BRAND_GREEN,
+    borderRadius: 30,
+    flexDirection: "row",
+    gap: 10,
     height: "100%",
     justifyContent: "center",
     overflow: "hidden",
-    paddingHorizontal: 26,
+    paddingHorizontal: 30,
   },
-  characterStage: {
-    left: 0,
-    position: "absolute",
-    right: 0,
-    top: 104,
-  },
-  corner: {
-    borderColor: "rgba(8, 11, 18, 0.78)",
-    height: 22,
-    position: "absolute",
-    width: 22,
-  },
-  cornerBottomLeft: {
-    borderBottomWidth: 2,
-    borderLeftWidth: 2,
-    bottom: 22,
-    left: 22,
-  },
-  cornerBottomRight: {
-    borderBottomWidth: 2,
-    borderRightWidth: 2,
-    bottom: 22,
-    right: 22,
-  },
-  cornerTopLeft: {
-    borderLeftWidth: 2,
-    borderTopWidth: 2,
-    left: 22,
-    top: 22,
-  },
-  cornerTopRight: {
-    borderRightWidth: 2,
-    borderTopWidth: 2,
-    right: 22,
-    top: 22,
+  contentLayer: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingBottom: 48,
+    paddingHorizontal: 32,
+    paddingTop: 60,
+    zIndex: 2,
   },
   enterButton: {
-    borderRadius: 26,
-    bottom: 42,
-    boxShadow: "0 16px 42px rgba(0, 255, 106, 0.18)",
-    height: 52,
-    minWidth: 190,
+    backgroundColor: BRAND_GREEN,
+    borderRadius: 30,
+    height: 58,
+    maxWidth: 384,
     overflow: "hidden",
-    position: "absolute",
-    transform: [{ scale: 1 }],
+    width: "100%",
   },
   enterButtonPressed: {
-    opacity: 0.78,
+    opacity: 0.84,
     transform: [{ scale: 0.98 }],
   },
   enterButtonText: {
-    color: colors.brandDark,
+    color: "#FFFFFF",
     fontFamily: "Courier",
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "800",
     letterSpacing: 0.6,
   },
   root: {
-    alignItems: "center",
-    backgroundColor: colors.canvas,
-    justifyContent: "center",
+    backgroundColor: "#F8F9FA",
     overflow: "hidden",
     zIndex: 1000,
   },
   title: {
-    color: colors.ink,
+    backgroundColor: "#F8F9FA",
+    color: "rgba(45, 187, 105, 0.9)",
     fontFamily: "Courier",
-    fontSize: 18,
-    fontWeight: "800",
-    letterSpacing: 1.4,
-    position: "absolute",
+    fontSize: 22,
+    fontWeight: "300",
+    letterSpacing: 2.8,
+    paddingHorizontal: 8,
     textAlign: "center",
-    top: 54,
+    textTransform: "uppercase",
+  },
+  titleRule: {
+    backgroundColor: "rgba(45, 187, 105, 0.3)",
+    height: 1,
+    marginTop: 14,
+    width: 48,
+  },
+  titleStrong: {
+    color: BRAND_GREEN,
+    fontWeight: "800",
+  },
+  titleWrap: {
+    alignItems: "center",
+    width: "100%",
   },
 });

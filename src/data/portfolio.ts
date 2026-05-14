@@ -33,6 +33,7 @@ export const accountSummary = {
   totalChangePercent: -0.05,
   lastUpdated: "10:31, 14/05/2026",
   availableCash: 3660.39,
+  buyingPower: 7320.78,
   investmentValue: 19573.7,
 };
 
@@ -40,8 +41,14 @@ export const homeCurve = [38, 41, 45, 52, 56, 57, 57, 57, 56.5, 58, 58.4, 55.2, 
 
 export const marketIndexes = [
   { symbol: "SPX500", value: 7456.91, changePercent: 0.07 },
+  { symbol: "NAS100", value: 21482.37, changePercent: 0.18 },
   { symbol: "BTC", value: 79623.15, changePercent: 0.36 },
   { symbol: "DJ30", value: 49798.55, changePercent: 0.01 },
+  { symbol: "SHCOMP", value: 3418.42, changePercent: -0.12 },
+  { symbol: "HK50", value: 19724.83, changePercent: 0.22 },
+  { symbol: "GER40", value: 18642.51, changePercent: -0.04 },
+  { symbol: "FTSE100", value: 8264.17, changePercent: 0.09 },
+  { symbol: "XAUUSD", value: 2341.62, changePercent: -0.16 },
 ];
 
 export const movers = [
@@ -175,6 +182,19 @@ export const watchlistAssets: EquityAsset[] = [
     logoBackground: "#ef2f7b",
     logoColor: "#ffffff",
     sparkline: [8, 8.1, 8.3, 8.2, 8.5, 8.8, 8.7, 9.1],
+  },
+  {
+    symbol: "NFLX",
+    name: "Netflix",
+    price: 1092.42,
+    change: -14.12,
+    changePercent: -1.28,
+    bid: 1092.18,
+    ask: 1092.66,
+    logoLabel: "N",
+    logoBackground: "#111827",
+    logoColor: "#e50914",
+    sparkline: [68, 67.6, 67.2, 66.8, 66.1, 65.9, 65.2, 64.8],
   },
 ];
 

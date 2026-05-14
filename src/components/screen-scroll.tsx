@@ -9,9 +9,10 @@ type ScreenScrollProps = {
   refreshControl?: ScrollViewProps["refreshControl"];
   includeTopInset?: boolean;
   bottomInset?: number;
+  maxContentWidth?: number;
 };
 
-export function ScreenScroll({ children, refreshControl, includeTopInset, bottomInset = 36 }: ScreenScrollProps) {
+export function ScreenScroll({ children, refreshControl, includeTopInset, bottomInset = 36, maxContentWidth }: ScreenScrollProps) {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const isWide = width >= 768;
@@ -32,7 +33,7 @@ export function ScreenScroll({ children, refreshControl, includeTopInset, bottom
         style={{
           alignSelf: "center",
           gap: spacing.lg,
-          maxWidth: isWide ? 820 : undefined,
+          maxWidth: isWide ? (maxContentWidth ?? 820) : undefined,
           width: "100%",
         }}
       >

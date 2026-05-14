@@ -212,6 +212,41 @@ http://localhost:8082/watchlist
 http://localhost:8082/insights
 ```
 
+### Home Visual Refinement
+
+Prompt direction:
+
+```text
+Refine the Home screen visual system. Keep the Eightcap white/black/green theme and strengthen the Liquid Glass feel. Rework Cash and Holding so it blends into the page background, shows a full-bleed line chart by default, supports hiding the amount with the eye icon, and reveals tap-based animated time slots plus Invested / Available metrics only after expansion. Sort Top Movers by percentage change, showing both gainers and losers. Keep live tick animations active for demo use.
+```
+
+Implementation scope:
+
+- `app/(tabs)/index.tsx`: Home responsive composition, phone single column and pad two-column layout.
+- `src/components/home-value-chart.tsx`: rebuilt Cash and Holding as a background-blended section with full-bleed chart, hide/show amount, expand/collapse control, tap-based animated time slots, and expanded Invested / Available metrics.
+- `src/components/mover-card.tsx`: rebuilt Top Movers with live gainers/losers, percentage sorting, flash-on-tick rows, sparklines, and detail links.
+- `src/components/screen-scroll.tsx`: added configurable wide max width for the Home page.
+- `src/data/portfolio.ts`: added buying power and an extra negative mock asset so pad can display 4 gainers and 4 losers.
+
+Commands and checks used:
+
+```bash
+npm run typecheck
+npx expo export --platform web
+npx expo start --web --port 8082
+npx -y playwright@latest install chromium
+npx -y playwright@latest screenshot --wait-for-timeout=5000 --viewport-size=390,844 http://localhost:8082 .codex-home-phone.png
+npx -y playwright@latest screenshot --wait-for-timeout=5000 --viewport-size=1024,900 http://localhost:8082 .codex-home-pad.png
+```
+
+Verification notes:
+
+- TypeScript passed with `tsc --noEmit`.
+- Expo web static export passed.
+- Phone screenshot verified that the Cash and Holding amount, eye toggle affordance, right-side daily movement, and full-bleed chart fit without truncation.
+- Pad screenshot verified that the full-width Cash and Holding section scales across the screen at `1024x900`.
+- React Native Web surfaced a `props.pointerEvents is deprecated` warning during dev-server verification; the remaining row components were updated to use `style.pointerEvents`.
+
 ## Notes
 
 - `gh auth status` showed GitHub CLI is authenticated as `RayLi-Muye`.

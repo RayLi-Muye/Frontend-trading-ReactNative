@@ -82,12 +82,12 @@ export function WatchlistQuoteRow({ asset, hotSide, pulse }: WatchlistQuoteRowPr
         }}
       >
         <Animated.View
-          pointerEvents="none"
           style={[
             {
               backgroundColor: pulse?.direction === "down" ? "rgba(255,47,61,0.14)" : "rgba(13,187,79,0.14)",
               bottom: 0,
               left: 0,
+              pointerEvents: "none",
               position: "absolute",
               right: 0,
               top: 0,
