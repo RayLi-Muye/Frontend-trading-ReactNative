@@ -151,6 +151,10 @@ Implementation notes:
 - Converted tab labels, screen titles, table headers, chips, CTAs, wallet labels, portfolio labels, watchlist labels, and instrument detail labels to English.
 - Updated the design brief to record English as the ongoing product UI baseline.
 
+### Frontend Discussion Rule
+
+The user set a hard collaboration rule: whenever future frontend page or component changes are discussed, quantify the corresponding code scope. Include the affected screen/component, likely files, approximate line count or change size, and any layout or interaction risk so the user can map design feedback to implementation cost.
+
 ### Figma Wireframe Creation
 
 ```text

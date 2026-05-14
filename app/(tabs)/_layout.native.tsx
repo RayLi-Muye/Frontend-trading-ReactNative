@@ -5,9 +5,9 @@ import { colors } from "@/design/theme";
 export default function NativeTabLayout() {
   return (
     <NativeTabs
-      backgroundColor="transparent"
+      backgroundColor="rgba(255,255,255,0.82)"
       badgeBackgroundColor="#cf241b"
-      blurEffect="systemUltraThinMaterial"
+      blurEffect="systemMaterialLight"
       disableTransparentOnScrollEdge
       iconColor={{ default: colors.muted, selected: colors.brandAction }}
       indicatorColor="rgba(5,184,63,0.18)"
