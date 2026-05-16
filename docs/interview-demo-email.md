@@ -26,7 +26,7 @@ https://github.com/RayLi-Muye/Demo-EightCap
 
 The app includes five primary tabs: Home, Invest, Watchlist, Discover, and Search/Wallet. It also includes deeper interaction levels, including stock detail pages, chart views, contextual menus, wallet actions, and the trade order ticket. For easier review, the web demo includes Phone, Pad, and Wide Pad preview modes directly on the page, so the reviewer does not need to use browser devtools to inspect different layouts.
 
-My development process was iterative. I started from product and visual direction, translated the experience into Expo Router screens and reusable React Native components, then refined the app through repeated feedback and browser testing. I used TypeScript checks, Expo web export, and an automated headless-browser smoke test to validate the main user flows before deploying through Vercel Git Integration.
+My development process was iterative. I started from product and visual direction, used Figma Make and Figma references to explore the Discover/navigation direction, translated the experience into Expo Router screens and reusable React Native components, then refined the app through repeated feedback and browser testing. I used TypeScript checks, Expo web export, and an automated headless-browser smoke test to validate the main user flows before deploying through Vercel Git Integration.
 
 There are a few parts of the project that I am especially proud of:
 
@@ -139,3 +139,34 @@ The reviewer can inspect the React Native implementation directly in:
 - `scripts/verify-web-demo.cjs`
 
 The Vercel demo remains the fastest way to experience the product, while GitHub provides evidence of the Expo Router structure, React Native components, mock data architecture, and verification workflow.
+
+## Appendix: Skills And Codex Commands
+
+### Skills And AI Workflows Used
+
+| Skill / workflow | How it contributed |
+|---|---|
+| Figma Make | Used as part of the design exploration workflow, especially for the Discover/navigation direction and visual reference translation. |
+| `$figma:figma-use` | Helped inspect and translate Figma design direction into implementation details. |
+| `$grill-me` | Used to stress-test plans, turn broad feedback into clear decisions, and refine product priorities. |
+| `$grill-with-docs` | Used for diagnosis when layout behavior needed to be checked against the existing implementation and documentation. |
+| Browser / in-app browser verification | Used to review `localhost` and deployed UI behavior across Phone, Pad, and Wide Pad preview modes. |
+| Parallel Agent workflow | Used to accelerate implementation and validation by splitting investigation, UI refinement, and verification workstreams. |
+| GitHub workflow | Used to commit, push, and make the repository public for review. |
+| Vercel workflow | Used to deploy through Git Integration and verify the public demonstration link. |
+
+### Codex Commands And Checks Used
+
+| Command | Purpose |
+|---|---|
+| `rg`, `sed`, `nl` | Locate files, inspect component code, and read exact line ranges before editing. |
+| `npm run web` | Run the local Expo web preview at `localhost:8081`. |
+| `npm run typecheck` | Validate TypeScript after implementation changes. |
+| `npm run export:web` | Confirm the Expo web static export used by Vercel. |
+| `npm run verify:web-demo` | Run automated headless-browser smoke tests for the core demo flow. |
+| `VERIFY_WEB_BASE_URL=<url> npm run verify:web-demo` | Run the same smoke test against the deployed Vercel URL. |
+| `git status`, `git diff`, `git log`, `git show` | Check repository state, review scope, and confirm shipped commits. |
+| `git add`, `git commit`, `git push` | Publish selected changes to GitHub. |
+| `gh repo view`, `gh repo edit` | Inspect and update the GitHub repository, including making it public. |
+| `vercel ls`, `vercel inspect`, `vercel project protection` | Check deployment state and disable SSO protection so the demo link is publicly accessible. |
+| `curl -I` | Confirm the deployed URL returns a public `200` response. |
