@@ -217,7 +217,7 @@ Secondary options:
 
 ## Open Decisions
 
-- Final repo visibility: currently private during build; make public or invite reviewers later for interview review.
+- Final repo visibility: initially private during build; public for interview review.
 - Whether the deployed app should use a neutral name like `Market Pulse Demo` to avoid brand confusion.
 - Whether to include generated visual assets or use abstract chart/product visuals.
 - Whether to keep the custom SVG sparkline or adopt a chart library for richer interactions later.

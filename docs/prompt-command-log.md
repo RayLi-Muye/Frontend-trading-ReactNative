@@ -4,6 +4,51 @@ Date: 2026-05-14
 
 This log records the prompts, research targets, and commands used while setting up the project. Keep updating it as the app moves from planning to Figma to implementation.
 
+## Interview Polish Command Index
+
+Date range covered: 2026-05-14 to 2026-05-17.
+
+This section reorganizes the recent collaboration into skills and command usage. It is intended to show how the prototype evolved through iterative product feedback, verification, and deployment rather than one large one-shot prompt.
+
+### Most Used Skills
+
+| Skill or workflow | How it was used |
+|---|---|
+| `$figma:figma-use` | Inspect and translate Figma direction, especially the Discover page and top navigation work. |
+| `$grill-me` | Stress-test plans and turn broad feedback into decision points. |
+| `$grill-with-docs` | Diagnose layout issues against the existing project and documentation assumptions. |
+| `deploy-to-vercel` | Prepare the deployment path around Vercel Git Integration. |
+| `github:yeet` / GitHub publish workflow | Commit and push the finished version to GitHub. |
+| Browser / in-app browser verification | Check local `localhost:8081` rendering and compare phone, pad, and wide pad preview modes. |
+
+### Most Used Commands
+
+| Command family | Purpose |
+|---|---|
+| `rg`, `sed`, `nl` | Locate components, inspect exact line ranges, and avoid broad edits without context. |
+| `npm run typecheck` | TypeScript verification after implementation changes. |
+| `npm run export:web` / `npx expo export --platform web` | Confirm Expo web static export for Vercel. |
+| `npm run verify:web-demo` | Run the smoke test covering launch, Discover, Wallet, trading, Portfolio, Watchlist, and preview modes. |
+| `npx expo start --web` / `npm run web` | Run the local Expo web server on `localhost:8081`. |
+| `git status`, `git diff`, `git show`, `git log` | Confirm working tree scope before staging and shipping. |
+| `git add`, `git commit`, `git push` | Publish selected application changes to GitHub. |
+| `vercel ls`, `vercel inspect`, `vercel project protection` | Confirm deployment status and remove SSO protection for public demo access. |
+| `curl -I` | Verify public deployment HTTP status after Vercel deployment. |
+
+### Recent Shipping Commands
+
+```bash
+npm run typecheck
+npm run export:web
+npm run verify:web-demo
+git add <selected app/src/scripts files>
+git commit -m "Refine web preview and trading UI"
+git push origin main
+vercel ls --format json --scope rays-projects-f956e95b
+vercel project protection disable demo-eightcap --sso --scope rays-projects-f956e95b
+VERIFY_WEB_BASE_URL=https://demo-eightcap-4imt45ymj-rays-projects-f956e95b.vercel.app npm run verify:web-demo
+```
+
 ## Initial User Prompt
 
 The user requested a React Native interview demonstration inspired by https://www.eightcap.com. The app should browse stock/market changes with mock data, emphasize visual quality, consider shareable delivery by link, support multi-device viewing, and keep Markdown documentation of prompts, commands, and project management. The codebase should be managed with Figma and GitHub.
@@ -247,13 +292,65 @@ Verification notes:
 - Pad screenshot verified that the full-width Cash and Holding section scales across the screen at `1024x900`.
 - React Native Web surfaced a `props.pointerEvents is deprecated` warning during dev-server verification; the remaining row components were updated to use `style.pointerEvents`.
 
+### Interactive Chart Scrubbing
+
+Prompt direction:
+
+```text
+Update the line chart interaction for Cash and Holding and individual stock/crypto detail pages. When pressing and holding a chart node or any position on the line chart, show the corresponding date, time, and value. While the user drags, update the selected node and displayed date/time/value in real time.
+```
+
+Implementation scope:
+
+- `src/components/sparkline.tsx`: added reusable press-and-drag chart scrubbing with nearest-node selection, vertical guide, active point marker, and floating value/date/time tooltip.
+- `src/components/home-value-chart.tsx`: added Cash and Holding mock date/time/value labels per active range, with hidden-value handling.
+- `app/instrument/[symbol].tsx`: added instrument chart date/time/price labels for stock and crypto detail charts.
+
+Commands and checks used:
+
+```bash
+npm run typecheck
+npx expo export --platform web
+```
+
+Verification notes:
+
+- TypeScript passed with `tsc --noEmit`.
+- Expo web static export passed.
+
+### Range-Specific Mock Chart Data
+
+Prompt direction:
+
+```text
+Update the current mock data so the data fits the line-chart behavior when selecting different time spans.
+```
+
+Implementation scope:
+
+- `src/data/portfolio.ts`: added `homeRangeDeltas` for Cash and Holding ranges and `instrumentRangeProfiles` for stock/crypto detail ranges.
+- `src/components/home-value-chart.tsx`: switched Home chart, change amount, percent, tooltip values, and chart color to derive from the selected range's mock data.
+- `app/instrument/[symbol].tsx`: switched stock/crypto detail charts from multiplier-based reuse to range-specific profiles anchored to the live mock asset price.
+
+Commands and checks used:
+
+```bash
+npm run typecheck
+npx expo export --platform web
+```
+
+Verification notes:
+
+- TypeScript passed with `tsc --noEmit`.
+- Expo web static export passed.
+
 ## Notes
 
 - `gh auth status` showed GitHub CLI is authenticated as `RayLi-Muye`.
 - `RayLi-Muye/Demo-EightCap` did not exist when checked.
 - The current directory was initially empty and not a Git repository.
 - One CSS variable extraction command failed because the pattern began with `--`; it should use `rg -- 'pattern'` if repeated.
-- A private GitHub repository was created at https://github.com/RayLi-Muye/Demo-EightCap.
+- A private GitHub repository was initially created at https://github.com/RayLi-Muye/Demo-EightCap and was later made public for interview review.
 - The local `main` branch tracks `origin/main`.
 - The project uses Expo Router with `app/` routes and keeps reusable components/data/tokens under `src/`.
 - `expo-api-routes` was reviewed. API routes are intentionally skipped for now because this version uses static mock data and has no server-side secrets.
