@@ -15,7 +15,7 @@ const ASCII_COLUMNS = 82;
 const ASCII_ROWS = 50;
 const BRAND_GREEN = "#2DBB69";
 const PHONE_ASCII_SCALE_ADJUSTMENT = 0.95;
-const PHONE_ASCII_OFFSET_Y_ADJUSTMENT = 0.1;
+const PHONE_ASCII_OFFSET_Y_ADJUSTMENT = 0.07;
 
 type SplashRequest = {
   autoHide: boolean;
