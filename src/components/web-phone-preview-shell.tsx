@@ -137,7 +137,7 @@ export function WebPhonePreviewShell({ children }: WebPhonePreviewShellProps) {
               height: frame.height,
               width: frame.width,
             },
-            title: "EightCap mobile app preview",
+            title: "Market Prototype mobile app preview",
           })}
         </View>
       </View>

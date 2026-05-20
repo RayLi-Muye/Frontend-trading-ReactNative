@@ -2,11 +2,11 @@
 
 Date: 2026-05-17
 
-This document contains email copy for sharing the EightCap prototype demonstration link, GitHub repository, and development context.
+This document contains email copy for sharing the Market Prototype demonstration link, GitHub repository, and development context.
 
 ## Recommended Email
 
-Subject: EightCap Prototype Demonstration - React Native / Expo
+Subject: Market Prototype Demonstration - React Native / Expo
 
 Hi [Name],
 
@@ -14,15 +14,15 @@ Thank you again for giving me the opportunity to complete this demonstration.
 
 I built the project as a React Native / Expo prototype for a mobile-first trading experience. It uses mock market and portfolio data, but the app flow is interactive: the user can move through the main tabs, inspect assets, open stock detail pages, use wallet actions, and place simulated buy/sell orders.
 
-For the visual direction, I referenced the main visual language of the Eightcap public website and used the green from the Eightcap logo as the primary theme color.
+For the visual direction, I referenced the main visual language of the market reference website and used the green from the brand accent as the primary theme color.
 
 Demo link:
 
-https://demo-eightcap.vercel.app
+<your-vercel-url>
 
 GitHub repository:
 
-https://github.com/RayLi-Muye/Demo-EightCap
+https://github.com/RayLi-Muye/Demo-EC-ReactNative
 
 The app includes five primary tabs: Home, Invest, Watchlist, Discover, and Search/Wallet. It also includes deeper interaction levels, including stock detail pages, chart views, contextual menus, wallet actions, and the trade order ticket. For easier review, the web demo includes Phone, Pad, and Wide Pad preview modes directly on the page, so the reviewer does not need to use browser devtools to inspect different layouts.
 
@@ -54,7 +54,7 @@ Ray Li
 
 ## Shorter Version
 
-Subject: EightCap Prototype Demonstration Link
+Subject: Market Prototype Demonstration Link
 
 Hi [Name],
 
@@ -62,15 +62,15 @@ Thank you again for the opportunity to complete this demonstration.
 
 I built the project as a React Native / Expo prototype for a mobile-first trading experience. The app uses mock market and portfolio data, but the product flow is interactive: it includes five tabs, wallet actions, stock detail pages, contextual menus, and simulated buy/sell order flows.
 
-The visual direction references Eightcap's public website, with the green from the Eightcap logo used as the primary theme color.
+The visual direction references a public market website, with the green from the brand accent used as the primary theme color.
 
 Demo link:
 
-https://demo-eightcap.vercel.app
+<your-vercel-url>
 
 GitHub repository:
 
-https://github.com/RayLi-Muye/Demo-EightCap
+https://github.com/RayLi-Muye/Demo-EC-ReactNative
 
 The web demo includes Phone, Pad, and Wide Pad preview modes directly on the page, so it can be reviewed without using browser devtools.
 
@@ -128,7 +128,7 @@ Ray Li
 
 The GitHub repository can be public:
 
-https://github.com/RayLi-Muye/Demo-EightCap
+https://github.com/RayLi-Muye/Demo-EC-ReactNative
 
 The reviewer can inspect the React Native implementation directly in:
 

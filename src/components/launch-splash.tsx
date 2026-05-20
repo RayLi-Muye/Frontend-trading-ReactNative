@@ -270,7 +270,7 @@ export function LaunchSplash() {
       <View pointerEvents="box-none" style={styles.contentLayer}>
         <View style={styles.titleWrap}>
           <Text style={styles.title}>
-            Eight Cap <Text style={styles.titleStrong}>prototype</Text>
+            <Text style={styles.titleStrong}>prototype</Text>
           </Text>
           <Text style={styles.subtitle}>By Ray Li</Text>
           <View style={styles.titleRule} />

@@ -1,4 +1,4 @@
-# Eightcap-Inspired Mobile Market Demo Brief
+# Market-Inspired Mobile Market Demo Brief
 
 Date: 2026-05-14
 
@@ -6,20 +6,20 @@ Date: 2026-05-14
 
 Build a polished React Native / Expo demo that lets reviewers browse mocked market movements on mobile and web. The goal is to demonstrate front-end craft: information architecture, visual system translation, responsive behavior, component quality, animation restraint, and clear project documentation.
 
-This is not a trading product and not an official Eightcap app. It should use mock data and clearly label any trading-like screens as demo content.
+This is not a trading product and not an official brokerage app. It should use mock data and clearly label any trading-like screens as demo content.
 
 Implementation update:
 
 - Keep the visible app experience closer to a real in-use account product. Avoid repeated on-screen explanations that the build is a demo.
-- Preserve Eightcap's homepage color logic: white/near-white canvas, strong black typography, bright green accent, light gray controls, and red/green market movement.
+- Preserve the reference visual logic: white/near-white canvas, strong black typography, bright green accent, light gray controls, and red/green market movement.
 - Use the provided mobile trading references for structure and density: Home, Invest, Watchlist, Discover, Wallet/Search, and stock detail flows.
 - Use English as the product UI baseline for all future implementation and design iterations.
 - The current deployed web demo includes Phone, Pad, and Wide Pad iframe preview modes so reviewers do not need browser devtools.
 - The GitHub repository is public for interview review.
 
-## Reference Signals From Eightcap
+## Reference Signals
 
-Source inspected: https://www.eightcap.com/en/traders/
+Source inspected: <brand-reference-url>
 
 Observed public-site patterns to borrow:
 
@@ -39,15 +39,15 @@ Suggested demo translation:
 
 ## Product Concept
 
-Working title: `Eightcap Market Pulse`
+Working title: `Market Pulse`
 
 One-sentence pitch:
 
-> A mobile-first market watch demo that lets users scan popular CFD-style instruments, compare short-term movement, and inspect mocked insights in a polished Eightcap-inspired interface.
+> A mobile-first market watch demo that lets users scan popular CFD-style instruments, compare short-term movement, and inspect mocked insights in a polished market-inspired interface.
 
 Primary reviewer impression:
 
-- "This candidate can translate a real brand into a product-quality mobile interface."
+- "This candidate can translate a visual reference into a product-quality mobile interface."
 - "The app is responsive, componentized, and visually disciplined."
 - "The project is well documented and ready for Figma/GitHub handoff."
 
@@ -128,7 +128,7 @@ Design system draft:
 
 - Base background: off-white / white.
 - Text: near-black with gray hierarchy.
-- Primary accent: Eightcap-style bright green.
+- Primary accent: market-style bright green.
 - Market up: green.
 - Market down: red.
 - Caution: amber/yellow.
@@ -218,13 +218,13 @@ Best email package:
   - built with React Native / Expo
   - responsive mobile-first market browsing demo
   - mock data only
-  - Eightcap-inspired visual research
+  - Market-Inspired visual research
   - highlights: chart UI, adaptive layout, documented prompt/command workflow
 
 Current public links:
 
-- Live demo: https://demo-eightcap.vercel.app
-- GitHub: https://github.com/RayLi-Muye/Demo-EightCap
+- Live demo: <your-vercel-url>
+- GitHub: https://github.com/RayLi-Muye/Demo-EC-ReactNative
 
 Secondary options:
 

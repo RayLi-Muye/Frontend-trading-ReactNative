@@ -36,7 +36,7 @@ export default function DisclaimerScreen() {
         <SectionHeader eyebrow="Portfolio demo" title="Clear boundary for reviewers" />
 
         <Text selectable style={{ color: colors.muted, fontSize: 15, lineHeight: 23 }}>
-          This project is a React Native interview demonstration. It is not affiliated with Eightcap, does not connect to live market feeds, and does not allow trading or account actions.
+          This project is a React Native interview demonstration. It is not affiliated with any brokerage, does not connect to live market feeds, and does not allow trading or account actions.
         </Text>
 
         <Text selectable style={{ color: colors.muted, fontSize: 15, lineHeight: 23 }}>

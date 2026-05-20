@@ -1,11 +1,11 @@
 # Interview Polish Roadmap
 
-This roadmap tracks the remaining and future work for the public EightCap prototype review link.
+This roadmap tracks the remaining and future work for the public Market Prototype review link.
 
 ## Current Status
 
-- Public demo: https://demo-eightcap.vercel.app
-- Public GitHub repo: https://github.com/RayLi-Muye/Demo-EightCap
+- Public demo: <your-vercel-url>
+- Public GitHub repo: https://github.com/RayLi-Muye/Demo-EC-ReactNative
 - Current app scope: Home, Invest, Watchlist, Discover, Wallet/Search, and stock/crypto detail pages.
 - Current web preview modes: Phone, Pad, and Wide Pad.
 - Current verification gates: TypeScript, Expo web export, market-data checks, and headless browser smoke testing.

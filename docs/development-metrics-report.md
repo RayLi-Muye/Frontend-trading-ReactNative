@@ -2,7 +2,7 @@
 
 Date: 2026-05-17
 
-This report records measurable signals from the EightCap prototype build. It separates exact repository data from estimated collaboration metrics.
+This report records measurable signals from the Market Prototype build. It separates exact repository data from estimated collaboration metrics.
 
 Snapshot note: repository metrics below reflect the public review state after the app deployment and documentation pass on 2026-05-17.
 
@@ -28,7 +28,7 @@ Snapshot note: repository metrics below reflect the public review state after th
 | TypeScript | Passed with `npm run typecheck` |
 | Expo web export | Passed with `npm run export:web` |
 | Local smoke test | Passed with `npm run verify:web-demo` |
-| Production smoke test | Passed with `VERIFY_WEB_BASE_URL=https://demo-eightcap.vercel.app npm run verify:web-demo` and the deployment URL smoke test |
+| Production smoke test | Passed with `VERIFY_WEB_BASE_URL=<your-vercel-url> npm run verify:web-demo` and the deployment URL smoke test |
 | Production HTTP status | `200` after disabling Vercel SSO protection |
 | Vercel deployment state | `READY` |
 | GitHub repository visibility | `PUBLIC` |
@@ -75,6 +75,6 @@ For interview discussion, present this honestly: the development process was ins
 
 ## Current Demo Links
 
-- Production: https://demo-eightcap.vercel.app
-- Deployment: https://demo-eightcap-4imt45ymj-rays-projects-f956e95b.vercel.app
-- GitHub: https://github.com/RayLi-Muye/Demo-EightCap
+- Production: <your-vercel-url>
+- Deployment: <your-vercel-url>
+- GitHub: https://github.com/RayLi-Muye/Demo-EC-ReactNative

@@ -2,7 +2,7 @@
 
 Date: 2026-05-17
 
-This document summarizes the technical design of the EightCap prototype for interview review.
+This document summarizes the technical design of the Market Prototype for interview review.
 
 ## Stack
 
@@ -42,7 +42,7 @@ This document summarizes the technical design of the EightCap prototype for inte
 | `src/components/home-value-chart.tsx` | Cash and Holding chart, value visibility, and market movement UI. |
 | `src/components/mover-card.tsx` | Home Top Movers rows with live tick visual states. |
 | `src/components/wallet-floating-actions.tsx` | Wallet floating action button with Deposit, Withdrawal, Transfer. |
-| `src/components/launch-splash.tsx` | Intro screen with animated ASCII EightCap prototype graphic. |
+| `src/components/launch-splash.tsx` | Intro screen with animated ASCII Market Prototype graphic. |
 | `scripts/verify-web-demo.cjs` | Headless Chrome smoke test for key product flows and preview modes. |
 
 ## Web Preview Shell
@@ -130,17 +130,17 @@ The smoke test covers:
 
 The project is deployed through Vercel Git Integration.
 
-- GitHub repo: `RayLi-Muye/Demo-EightCap`
-- GitHub URL: https://github.com/RayLi-Muye/Demo-EightCap
+- GitHub repo: `RayLi-Muye/Demo-EC-ReactNative`
+- GitHub URL: https://github.com/RayLi-Muye/Demo-EC-ReactNative
 - Branch: `main`
-- Vercel project: `demo-eightcap`
-- Production URL: https://demo-eightcap.vercel.app
+- Vercel project: `market-demo`
+- Production URL: <your-vercel-url>
 
 SSO deployment protection was disabled so interview reviewers can open the public link without logging into Vercel.
 
 ## Design And AI Workflow
 
-- The visual direction references the public Eightcap website and uses the green from the Eightcap logo as the primary theme color.
+- The visual direction references the public market website and uses the green from the brand accent as the primary theme color.
 - Figma Make and Figma references were used during design exploration, especially for Discover and navigation direction.
 - Codex skills and workflows used during the project included `$figma:figma-use`, `$grill-me`, `$grill-with-docs`, Browser/in-app browser verification, GitHub publishing, and Vercel deployment.
 - Parallel AI agent workstreams were used to accelerate implementation, investigation, documentation, and verification.
@@ -162,8 +162,8 @@ Recommended maintenance approach:
 
 Recommended strategy:
 
-1. Keep the repository public for interview review: https://github.com/RayLi-Muye/Demo-EightCap.
-2. Share the Vercel demo link as the primary product experience: https://demo-eightcap.vercel.app.
+1. Keep the repository public for interview review: https://github.com/RayLi-Muye/Demo-EC-ReactNative.
+2. Share the Vercel demo link as the primary product experience: <your-vercel-url>
 3. Point reviewers to the React Native implementation in `app/` and `src/`.
 4. Keep local caches, worktrees, and machine-specific files out of Git.
 5. Continue avoiding `.env`, API credentials, or private account data in the repository.
@@ -171,5 +171,5 @@ Recommended strategy:
 Suggested archive command for a review bundle:
 
 ```bash
-git archive --format=zip -o eightcap-code-review.zip HEAD app src package.json app.json tsconfig.json vercel.json README.md docs/technical-implementation-notes.md
+git archive --format=zip -o market-code-review.zip HEAD app src package.json app.json tsconfig.json vercel.json README.md docs/technical-implementation-notes.md
 ```

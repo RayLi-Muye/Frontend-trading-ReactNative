@@ -9,8 +9,8 @@ import {
   type WalletAccount,
 } from "@/data/portfolio";
 
-const holdingsStorageKey = "eightcap-demo-portfolio-holdings-v1";
-const accountsStorageKey = "eightcap-demo-wallet-accounts-v1";
+const holdingsStorageKey = "market-demo-portfolio-holdings-v1";
+const accountsStorageKey = "market-demo-wallet-accounts-v1";
 const tradeDateLabel = "Today";
 let revision = 0;
 const listeners = new Set<() => void>();

@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Eightcap Market Demo",
-    "slug": "eightcap-market-demo",
+    "name": "Market Prototype Demo",
+    "slug": "market-prototype-demo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "eightcapmarketdemo",
+    "scheme": "marketprototypedemo",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/images/splash-icon.png",

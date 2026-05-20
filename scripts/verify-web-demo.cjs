@@ -9,8 +9,8 @@ const distDir = path.join(root, "dist");
 const port = Number(process.env.VERIFY_WEB_PORT ?? 4188);
 const remoteBaseUrl = process.env.VERIFY_WEB_BASE_URL?.replace(/\/$/, "");
 const baseUrl = remoteBaseUrl ?? `http://127.0.0.1:${port}`;
-const holdingsKey = "eightcap-demo-portfolio-holdings-v1";
-const accountsKey = "eightcap-demo-wallet-accounts-v1";
+const holdingsKey = "market-demo-portfolio-holdings-v1";
+const accountsKey = "market-demo-wallet-accounts-v1";
 
 const chromeCandidates = [
   process.env.CHROME_PATH,
@@ -497,7 +497,7 @@ async function main() {
   }
 
   const debugPort = port + 1000;
-  const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), "eightcap-web-verify-"));
+  const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), "market-web-verify-"));
   const chrome = childProcess.spawn(chromePath, [
     "--headless=new",
     "--disable-background-networking",

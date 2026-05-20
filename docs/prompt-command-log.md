@@ -46,22 +46,22 @@ git add <selected app/src/scripts files>
 git commit -m "Refine web preview and trading UI"
 git push origin main
 vercel ls --format json --scope rays-projects-f956e95b
-vercel project protection disable demo-eightcap --sso --scope rays-projects-f956e95b
-VERIFY_WEB_BASE_URL=https://demo-eightcap-4imt45ymj-rays-projects-f956e95b.vercel.app npm run verify:web-demo
-gh repo edit RayLi-Muye/Demo-EightCap --visibility public --accept-visibility-change-consequences
+vercel project protection disable market-demo --sso --scope rays-projects-f956e95b
+VERIFY_WEB_BASE_URL=<your-vercel-url> npm run verify:web-demo
+gh repo edit RayLi-Muye/Demo-EC-ReactNative --visibility public --accept-visibility-change-consequences
 git commit -m "Update interview documentation"
-git commit -m "Clarify Eightcap visual reference"
+git commit -m "Clarify visual reference"
 git commit -m "Add workflow appendix to interview email"
 ```
 
 ## Initial User Prompt
 
-The user requested a React Native interview demonstration inspired by https://www.eightcap.com. The app should browse stock/market changes with mock data, emphasize visual quality, consider shareable delivery by link, support multi-device viewing, and keep Markdown documentation of prompts, commands, and project management. The codebase should be managed with Figma and GitHub.
+The user requested a React Native interview demonstration inspired by a public market reference. The app should browse stock/market changes with mock data, emphasize visual quality, consider shareable delivery by link, support multi-device viewing, and keep Markdown documentation of prompts, commands, and project management. The codebase should be managed with Figma and GitHub.
 
 ## Research Targets
 
-- Eightcap homepage / trader page: https://www.eightcap.com/en/traders/
-- Key observations captured in `docs/eightcap-mobile-demo-brief.md`.
+- market reference homepage/trader page: reference URL removed
+- Key observations captured in `docs/mobile-market-demo-brief.md`.
 
 ## Commands Run
 
@@ -75,13 +75,13 @@ ls -la
 git status --short --branch
 gh auth status
 sed -n '1,240p' /Users/winnie/.agents/skills/building-native-ui/SKILL.md
-gh repo view RayLi-Muye/Demo-EightCap --json nameWithOwner,url,visibility,description
-curl -L -s https://www.eightcap.com/en/traders/ | rg -o 'href="[^\"]+\\.css[^\"]*"|src="[^\"]+"|#[0-9A-Fa-f]{6}|--[A-Za-z0-9_-]+:[^;]+' | head -160
-curl -L -s https://www.eightcap.com/en/traders/ | rg -n "Trade at lightning speed|Top 10 instruments|Trade smarter|Ready to trade your way|Market Insights|Risk Warning|DEVICES|Eightcap Logos" -C 2
-curl -L -s 'https://www.eightcap.com/_next/static/css/5e51ac8edf0f9e07.css?dpl=dpl_3MNkQHG9dsRkCyyLCLZMA4kWGtn6' | rg -o '#[0-9A-Fa-f]{3,8}' | sort | uniq | head -120
-curl -L -s 'https://www.eightcap.com/_next/static/css/ac6eceaa8113dd94.css?dpl=dpl_3MNkQHG9dsRkCyyLCLZMA4kWGtn6' | rg -o '#[0-9A-Fa-f]{3,8}' | sort | uniq | head -120
-curl -L -s 'https://www.eightcap.com/_next/static/css/da6512f5b0afe8ea.css?dpl=dpl_3MNkQHG9dsRkCyyLCLZMA4kWGtn6' | rg -o '#[0-9A-Fa-f]{3,8}' | sort | uniq | head -120
-curl -L -s 'https://www.eightcap.com/_next/static/css/5e51ac8edf0f9e07.css?dpl=dpl_3MNkQHG9dsRkCyyLCLZMA4kWGtn6' | rg -n 'bg-utility-brand|bg-icon-brand|bg-audience-traders|fg-text-default-black|glass-effect|banner-gradient' -C 1
+gh repo view RayLi-Muye/Demo-EC-ReactNative --json nameWithOwner,url,visibility,description
+curl -L -s <brand-reference-url> | rg -o 'href="[^\"]+\\.css[^\"]*"|src="[^\"]+"|#[0-9A-Fa-f]{6}|--[A-Za-z0-9_-]+:[^;]+' | head -160
+curl -L -s <brand-reference-url> | rg -n "Trade at lightning speed|Top 10 instruments|Trade smarter|Ready to trade your way|Market Insights|Risk Warning|DEVICES|Brand Logos" -C 2
+curl -L -s '<brand-reference-url>' | rg -o '#[0-9A-Fa-f]{3,8}' | sort | uniq | head -120
+curl -L -s '<brand-reference-url>' | rg -o '#[0-9A-Fa-f]{3,8}' | sort | uniq | head -120
+curl -L -s '<brand-reference-url>' | rg -o '#[0-9A-Fa-f]{3,8}' | sort | uniq | head -120
+curl -L -s '<brand-reference-url>' | rg -n 'bg-utility-brand|bg-icon-brand|bg-audience-traders|fg-text-default-black|glass-effect|banner-gradient' -C 1
 mkdir -p docs
 git config --global user.name
 git config --global user.email
@@ -89,12 +89,12 @@ gh api user --jq '{login: .login, id: .id, name: .name, email: .email}'
 git init -b main
 git config user.name RayLi
 git config user.email 161552348+RayLi-Muye@users.noreply.github.com
-git add README.md docs/eightcap-mobile-demo-brief.md docs/figma-wireframe-brief.md docs/prompt-command-log.md .gitignore
-git commit -m "Initialize Eightcap demo brief"
-gh repo create Demo-EightCap --private --source=. --remote=origin --push --description "React Native market browsing demo inspired by Eightcap"
+git add README.md docs/mobile-market-demo-brief.md docs/figma-wireframe-brief.md docs/prompt-command-log.md .gitignore
+git commit -m "Initialize market demo brief"
+gh repo create Demo-EC-ReactNative --private --source=. --remote=origin --push --description "React Native market browsing demo inspired by market UI patterns"
 git status --short --branch
 git remote -v
-gh repo view RayLi-Muye/Demo-EightCap --json nameWithOwner,url,visibility,description,defaultBranchRef
+gh repo view RayLi-Muye/Demo-EC-ReactNative --json nameWithOwner,url,visibility,description,defaultBranchRef
 ```
 
 ### Expo Scaffold And Implementation
@@ -105,8 +105,8 @@ sed -n '1,220p' /Users/winnie/.agents/skills/building-native-ui/SKILL.md
 node --version
 npm --version
 npx create-expo-app@latest --help
-rm -rf /tmp/demo-eightcap-expo-scaffold && npx create-expo-app@latest /tmp/demo-eightcap-expo-scaffold --template tabs
-cp -R /tmp/demo-eightcap-expo-scaffold/app /tmp/demo-eightcap-expo-scaffold/assets /tmp/demo-eightcap-expo-scaffold/app.json /tmp/demo-eightcap-expo-scaffold/package.json /tmp/demo-eightcap-expo-scaffold/package-lock.json /tmp/demo-eightcap-expo-scaffold/tsconfig.json .
+rm -rf /tmp/market-demo-expo-scaffold && npx create-expo-app@latest /tmp/market-demo-expo-scaffold --template tabs
+cp -R /tmp/market-demo-expo-scaffold/app /tmp/market-demo-expo-scaffold/assets /tmp/market-demo-expo-scaffold/app.json /tmp/market-demo-expo-scaffold/package.json /tmp/market-demo-expo-scaffold/package-lock.json /tmp/market-demo-expo-scaffold/tsconfig.json .
 npm install
 npx expo install react-native-svg expo-haptics
 npm install lucide-react-native
@@ -208,7 +208,7 @@ The user set a hard collaboration rule: whenever future frontend page or compone
 ### Figma Wireframe Creation
 
 ```text
-Figma file created: Eightcap Market Demo - Wireframes
+Figma file created: Market Prototype Demo - Wireframes
 Figma URL: https://www.figma.com/design/CsK2FHAqyu4bmOkiXTmkGp
 Pages created: 00 Cover, 01 Wireframes, 02 Components
 Main frames: Market Home, Instrument Detail, Watchlist, Insights, Disclaimer, Small Phone Home, Tablet-Web Preview
@@ -234,7 +234,7 @@ The user provided four iPhone screenshots as implementation references and reque
 - Watchlist
 - Wallet
 
-The Eightcap public homepage was rechecked at https://www.eightcap.com/ and redirects to `/en/traders/`. The implementation keeps the observed white/near-white surfaces, black typography, bright green accent, and red/green movement states while reducing visible demo explanation in the main screens.
+The market reference homepage was rechecked at <brand-reference-url> and redirects to `/en/traders/`. The implementation keeps the observed white/near-white surfaces, black typography, bright green accent, and red/green movement states while reducing visible demo explanation in the main screens.
 
 Commands and checks used for this revision:
 
@@ -267,7 +267,7 @@ http://localhost:8082/insights
 Prompt direction:
 
 ```text
-Refine the Home screen visual system. Keep the Eightcap white/black/green theme and strengthen the Liquid Glass feel. Rework Cash and Holding so it blends into the page background, shows a full-bleed line chart by default, supports hiding the amount with the eye icon, and reveals tap-based animated time slots plus Invested / Available metrics only after expansion. Sort Top Movers by percentage change, showing both gainers and losers. Keep live tick animations active for demo use.
+Refine the Home screen visual system. Keep the white/black/green theme and strengthen the Liquid Glass feel. Rework Cash and Holding so it blends into the page background, shows a full-bleed line chart by default, supports hiding the amount with the eye icon, and reveals tap-based animated time slots plus Invested / Available metrics only after expansion. Sort Top Movers by percentage change, showing both gainers and losers. Keep live tick animations active for demo use.
 ```
 
 Implementation scope:
@@ -352,10 +352,10 @@ Verification notes:
 ## Notes
 
 - `gh auth status` showed GitHub CLI is authenticated as `RayLi-Muye`.
-- `RayLi-Muye/Demo-EightCap` did not exist when checked.
+- `RayLi-Muye/Demo-EC-ReactNative` did not exist when checked.
 - The current directory was initially empty and not a Git repository.
 - One CSS variable extraction command failed because the pattern began with `--`; it should use `rg -- 'pattern'` if repeated.
-- A private GitHub repository was initially created at https://github.com/RayLi-Muye/Demo-EightCap and was later made public for interview review.
+- A private GitHub repository was initially created at https://github.com/RayLi-Muye/Demo-EC-ReactNative and was later made public for interview review.
 - The local `main` branch tracks `origin/main`.
 - The project uses Expo Router with `app/` routes and keeps reusable components/data/tokens under `src/`.
 - `expo-api-routes` was reviewed. API routes are intentionally skipped for now because this version uses static mock data and has no server-side secrets.
@@ -370,19 +370,19 @@ Verification notes:
 ### Figma Prompt
 
 ```text
-Create a mobile-first Figma wireframe and visual direction for a React Native market browsing demo inspired by Eightcap's public trader website. Use the project brief in docs/eightcap-mobile-demo-brief.md and the screen list in docs/figma-wireframe-brief.md. The first screen should be a usable market dashboard, not a landing page. Include components for instrument rows, chart cards, segmented controls, insights, and a demo risk disclaimer.
+Create a mobile-first Figma wireframe and visual direction for a React Native market browsing demo inspired by a public market website. Use the project brief in docs/mobile-market-demo-brief.md and the screen list in docs/figma-wireframe-brief.md. The first screen should be a usable market dashboard, not a landing page. Include components for instrument rows, chart cards, segmented controls, insights, and a demo risk disclaimer.
 ```
 
 ### Implementation Prompt
 
 ```text
-Scaffold an Expo Router + TypeScript React Native app for the Eightcap Market Demo. Use mock data only. Implement the Market Home, Instrument Detail, Watchlist, Insights, and Disclaimer screens. Keep the layout mobile-first, responsive on web, and visually aligned with docs/eightcap-mobile-demo-brief.md.
+Scaffold an Expo Router + TypeScript React Native app for the Market Prototype Demo. Use mock data only. Implement the Market Home, Instrument Detail, Watchlist, Insights, and Disclaimer screens. Keep the layout mobile-first, responsive on web, and visually aligned with docs/mobile-market-demo-brief.md.
 ```
 
 Updated implementation direction:
 
 ```text
-Revise the Expo Router app into a Tradle-inspired active account experience with four tabs: Home, My Investments, Watchlist, and Wallet. Preserve Eightcap's white/black/green visual theme, use mock account/stock data, and avoid repeated on-screen demo explanations in the primary product flow.
+Revise the Expo Router app into a Tradle-inspired active account experience with four tabs: Home, My Investments, Watchlist, and Wallet. Preserve white/black/green visual theme, use mock account/stock data, and avoid repeated on-screen demo explanations in the primary product flow.
 ```
 
 ### Review Prompt

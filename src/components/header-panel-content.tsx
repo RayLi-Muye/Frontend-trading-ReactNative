@@ -71,7 +71,7 @@ export function HeaderPanelContent({
   onLogout: () => void;
   rewardLabel?: string;
 }) {
-  const title = activePanel === "menu" ? "EightCap" : activePanel === "promo" ? "Promo" : "Notifications";
+  const title = activePanel === "menu" ? "Market Prototype" : activePanel === "promo" ? "Promo" : "Notifications";
   const rewardAmount = rewardLabel?.replace(/^Earn\s+/i, "") ?? "$200";
 
   return (

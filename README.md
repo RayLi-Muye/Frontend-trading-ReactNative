@@ -4,11 +4,11 @@ An interview demonstration project by Ray Li.
 
 This is a React Native / Expo prototype built as an interview demonstration for a mobile-first trading experience. It uses mock market, wallet, watchlist, and portfolio data so the focus can stay on frontend craft, interaction depth, responsive behavior, and the AI-assisted development workflow.
 
-This is not an official Eightcap product and does not connect to real trading or brokerage services.
+This is not an official brokerage product and does not connect to real trading or brokerage services.
 
 ## Links
 
-- Live demo: https://demo-eightcap.vercel.app
+- Live demo: <your-vercel-url>
 
 ## Current Status
 
@@ -146,7 +146,7 @@ npm run verify:web-demo
 Production smoke test:
 
 ```bash
-VERIFY_WEB_BASE_URL=https://demo-eightcap.vercel.app npm run verify:web-demo
+VERIFY_WEB_BASE_URL=<your-vercel-url> npm run verify:web-demo
 ```
 
 The smoke test covers:
@@ -163,7 +163,7 @@ The smoke test covers:
 
 ## Documentation
 
-- [Mobile demo brief](docs/eightcap-mobile-demo-brief.md)
+- [Mobile demo brief](docs/mobile-market-demo-brief.md)
 - [Figma wireframe brief](docs/figma-wireframe-brief.md)
 - [Interview polish roadmap](docs/interview-polish-roadmap.md)
 - [Prompt and command log](docs/prompt-command-log.md)

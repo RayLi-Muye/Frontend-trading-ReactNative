@@ -8,7 +8,7 @@ Use this document as the starting point for Figma wireframes and a clickable pro
 
 ## Figma File
 
-- File name: `Eightcap Market Demo - Wireframes`
+- File name: `Market Prototype Demo - Wireframes`
 - URL: https://www.figma.com/design/CsK2FHAqyu4bmOkiXTmkGp
 - Pages: `00 Cover`, `01 Wireframes`, `02 Components`
 - Status: original mobile-first wireframes created, basic prototype navigation wired, and visually checked against standard phone and tablet-web preview frames.
@@ -95,12 +95,12 @@ Implemented prototype links:
 
 Current implementation references:
 
-- Live demo: https://demo-eightcap.vercel.app
-- Public GitHub repo: https://github.com/RayLi-Muye/Demo-EightCap
+- Live demo: <your-vercel-url>
+- Public GitHub repo: https://github.com/RayLi-Muye/Demo-EC-ReactNative
 
 ## Copy Guidelines
 
 - Keep UI copy short and practical.
 - Label the app as a demo where trading-like content appears.
-- Avoid official Eightcap claims or regulated product promises.
+- Avoid official brokerage claims or regulated product promises.
 - Do not present mock data as live data.
