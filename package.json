@@ -11,6 +11,7 @@
     "preview:web": "npx serve dist",
     "vercel-build": "expo export --platform web",
     "check:market-data": "node scripts/check-market-data.cjs",
+    "check:simulated-trading": "node scripts/check-simulated-trading-domain.cjs",
     "verify:web-demo": "node scripts/verify-web-demo.cjs",
     "typecheck": "tsc --noEmit"
   },

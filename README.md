@@ -164,6 +164,7 @@ The smoke test covers:
 ## Documentation
 
 - [Product vision and roadmap](docs/product-vision.md)
+- [Simulated trading domain contract](docs/simulated-trading-domain.md)
 - [Mobile demo brief](docs/mobile-market-demo-brief.md)
 - [Figma wireframe brief](docs/figma-wireframe-brief.md)
 - [Interview polish roadmap](docs/interview-polish-roadmap.md)
