@@ -7,6 +7,7 @@ This project should move toward public-repo documentation quality: clear entry p
 | Area | Target file | Current status |
 | --- | --- | --- |
 | Project entry point | `README.md` | Exists, but still describes the interview demo and needs production-roadmap refresh. |
+| Product vision | `docs/product-vision.md` | Added as the high-level roadmap alignment reference. |
 | Domain language | `CONTEXT.md` | Missing from the base branch; planned as the canonical glossary. |
 | Architecture decisions | `docs/adr/*.md` | Missing from the base branch; planned for accepted architecture decisions. |
 | Backend architecture | `docs/backend-architecture.md` | Missing. |
@@ -100,6 +101,7 @@ GitHub Actions failures are blockers for merge decisions. Fix or explicitly tria
 ## Update Discipline
 
 - Product terminology changes go to `CONTEXT.md`.
+- New roadmap issues should cite `docs/product-vision.md` and state which phase they support.
 - Hard-to-reverse decisions go to `docs/adr/`.
 - Backend table or API changes must update `docs/database.md` or `docs/api.md` in the same change.
 - Release-visible behavior changes must update `CHANGELOG.md` or `DEVLOG.md`.
