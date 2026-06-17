@@ -1,0 +1,48 @@
+name: Production architecture
+description: Propose backend, data, security, deployment, or architecture work.
+title: "chore: "
+labels: ["architecture"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What production risk or capability gap does this address?
+    validations:
+      required: true
+  - type: textarea
+    id: decision-context
+    attributes:
+      label: Decision context
+      description: Summarize known constraints, alternatives, and affected ADRs.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What implementation and documentation work is included?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: |
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: docs
+    attributes:
+      label: Documentation impact
+      description: List required updates to CONTEXT.md, ADRs, backend docs, API docs, database docs, or security docs.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Tests / verification
+      description: Commands, CI checks, migrations, or proof expected.
+    validations:
+      required: true
