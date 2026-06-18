@@ -27,6 +27,7 @@ const { createDemoInstrumentPositionSummary } = require("../src/services/demo-in
 const { createDemoPortfolioLearningInsights } = require("../src/services/demo-portfolio-insights.ts");
 const { applyDemoSimulatedMarketOrder, previewDemoSimulatedMarketOrder } = require("../src/services/demo-simulated-trading.ts");
 const { createDemoTradeJournal } = require("../src/services/demo-trade-journal.ts");
+const { createDemoWatchlistCompare } = require("../src/services/demo-watchlist-compare.ts");
 
 const quote = {
   symbol: "NVDA",
@@ -272,6 +273,34 @@ const sellFilteredTradeJournal = createDemoTradeJournal({
 });
 
 assert.equal(sellFilteredTradeJournal.entries.length, 0);
+
+const watchlistCompare = createDemoWatchlistCompare({
+  assets: [
+    fixtureAsset,
+    {
+      ...fixtureAsset,
+      name: "Oracle",
+      price: 190,
+      symbol: "ORCL",
+    },
+    {
+      ...fixtureAsset,
+      name: "Meta Platforms",
+      price: 617,
+      symbol: "META",
+    },
+  ],
+  holdings: demoBuy.holdings,
+  selectedSymbols: ["amd", "orcl", "meta", "amd", "missing"],
+});
+
+assert.equal(watchlistCompare.rows.length, 3);
+assert.equal(watchlistCompare.rows[0].symbol, "AMD");
+assert.equal(watchlistCompare.rows[0].holdingStatus, "Held");
+assert.equal(watchlistCompare.rows[0].positionValue, 100);
+assert(watchlistCompare.rows[0].exposurePercent > 0);
+assert.equal(watchlistCompare.rows[1].holdingStatus, "Not held");
+assert.match(watchlistCompare.disclosure, /Not financial advice/);
 
 const demoPreview = previewDemoSimulatedMarketOrder(
   {

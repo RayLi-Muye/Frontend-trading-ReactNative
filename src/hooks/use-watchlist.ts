@@ -72,3 +72,7 @@ export function useWatchlistAssets() {
     [currentRevision],
   );
 }
+
+export function useWatchlistAssetUniverse() {
+  return useMemo(() => Array.from(assetUniverse.values()), []);
+}
