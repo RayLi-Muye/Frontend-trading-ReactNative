@@ -327,6 +327,14 @@ export function sellPortfolioAsset(symbol: string, units = 1, executionPrice?: n
   return placeDemoSimulatedOrder(holding, "sell", units, tradePrice);
 }
 
+export function resetDemoState() {
+  portfolioHoldings = cloneInitialHoldings();
+  walletAccountState = cloneInitialWalletAccounts();
+  simulatedLedgerEntries = [];
+  tradeSequence = 0;
+  emitChange();
+}
+
 export function depositWalletFunds(code: string, amount: number) {
   if (amount <= 0) {
     return undefined;
@@ -411,4 +419,17 @@ export function useLatestSimulatedLedgerEntry() {
     const entry = simulatedLedgerEntries[simulatedLedgerEntries.length - 1];
     return entry ? { ...entry } : undefined;
   }, [currentRevision]);
+}
+
+export function useRecentSimulatedLedgerEntries(limit = 3) {
+  const currentRevision = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  const normalizedLimit = Number.isFinite(limit) ? Math.max(0, Math.floor(limit)) : 0;
+
+  return useMemo(() => {
+    if (normalizedLimit === 0) {
+      return [];
+    }
+
+    return simulatedLedgerEntries.slice(-normalizedLimit).reverse().map((entry) => ({ ...entry }));
+  }, [currentRevision, normalizedLimit]);
 }

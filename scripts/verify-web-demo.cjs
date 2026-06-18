@@ -229,6 +229,10 @@ async function storedHoldings(client) {
   return evaluate(client, `JSON.parse(localStorage.getItem('${holdingsKey}') || '[]')`);
 }
 
+async function storedLedgerEntries(client) {
+  return evaluate(client, `JSON.parse(localStorage.getItem('${ledgerKey}') || '[]')`);
+}
+
 async function runVerification(client) {
   await client.send("Page.enable");
   await client.send("Runtime.enable");
@@ -293,7 +297,23 @@ async function runVerification(client) {
   await waitFor(client, `document.body.innerText.includes('Watch List') && document.body.innerText.includes('Market')`, "watch list");
 
   await navigate(client, "/wallet");
-  await waitFor(client, `document.body.innerText.includes('Wallet')`, "wallet final route");
+  await waitFor(
+    client,
+    `document.body.innerText.includes('Wallet') && document.body.innerText.includes('Simulated Activity') && document.body.innerText.includes('Virtual cash debit') && document.body.innerText.includes('Balance after')`,
+    "wallet simulated activity",
+  );
+  const ledgerAfterBuy = await storedLedgerEntries(client);
+  assert(ledgerAfterBuy.length === 1, "Wallet activity should reflect the simulated buy ledger entry.");
+
+  await clickLabel(client, "Reset demo state");
+  await waitFor(client, `document.body.innerText.includes('No simulated trades yet')`, "wallet reset empty activity");
+  const ledgerAfterReset = await storedLedgerEntries(client);
+  const accountsAfterReset = await storedAccounts(client);
+  const holdingsAfterReset = await storedHoldings(client);
+  assert(ledgerAfterReset.length === 0, "Reset should clear simulated ledger entries.");
+  assert(accountBalance(accountsAfterReset, "USD") === 3660.39, "Reset should restore initial USD cash.");
+  assert(accountBalance(accountsAfterReset, "AUD") === 0, "Reset should restore initial AUD cash.");
+  assert(!holdingsAfterReset.some((holding) => holding.symbol === "NVDA"), "Reset should remove the demo NVDA purchase.");
 }
 
 async function runDesktopNavigationVerification(client) {
