@@ -9,6 +9,7 @@ import { AppHeader } from "@/components/app-header";
 import { PageTitle } from "@/components/page-title";
 import { PortfolioLearningInsightsPanel } from "@/components/portfolio-learning-insights-panel";
 import { ScreenScroll } from "@/components/screen-scroll";
+import { TradeJournalRecapPanel } from "@/components/trade-journal-recap-panel";
 import { WalletFloatingActions } from "@/components/wallet-floating-actions";
 import { colors, radius, shadows, spacing } from "@/design/theme";
 import type { SimulatedLedgerEntry } from "@/domain/simulated-trading";
@@ -16,8 +17,11 @@ import {
   resetDemoState,
   useDemoAccountSummary,
   useDemoPortfolioLearningInsights,
+  useDemoTradeJournal,
   useRecentSimulatedLedgerEntries,
   useWalletAccounts,
+  type DemoTradeJournalAction,
+  type DemoTradeJournalFilterValue,
 } from "@/hooks/use-demo-portfolio";
 import { formatCurrency } from "@/utils/format";
 
@@ -160,12 +164,17 @@ export default function WalletScreen() {
   const recentLedgerEntries = useRecentSimulatedLedgerEntries(3);
   const [selectedAccountCode, setSelectedAccountCode] = useState(walletAccounts[0]?.code ?? "USD");
   const [actionsExpanded, setActionsExpanded] = useState(false);
+  const [journalActionFilter, setJournalActionFilter] = useState<DemoTradeJournalAction | DemoTradeJournalFilterValue>("all");
+  const [journalSymbolFilter, setJournalSymbolFilter] = useState<string | DemoTradeJournalFilterValue>("all");
+  const tradeJournal = useDemoTradeJournal({ action: journalActionFilter, symbol: journalSymbolFilter });
   const selectedAccount = walletAccounts.find((account) => account.code === selectedAccountCode) ?? walletAccounts[0];
 
   function handleResetDemoState() {
     resetDemoState();
     setSelectedAccountCode("USD");
     setActionsExpanded(false);
+    setJournalActionFilter("all");
+    setJournalSymbolFilter("all");
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
   }
 
@@ -185,6 +194,14 @@ export default function WalletScreen() {
         />
 
         <PortfolioLearningInsightsPanel insights={learningInsights} />
+
+        <TradeJournalRecapPanel
+          actionFilter={journalActionFilter}
+          journal={tradeJournal}
+          onActionFilterChange={setJournalActionFilter}
+          onSymbolFilterChange={setJournalSymbolFilter}
+          symbolFilter={journalSymbolFilter}
+        />
 
         <View style={{ gap: spacing.md }}>
           <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: "600" }}>
