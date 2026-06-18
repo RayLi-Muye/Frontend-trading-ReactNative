@@ -10,6 +10,10 @@ import {
 } from "@/data/portfolio";
 import type { SimulatedLedgerEntry } from "@/domain/simulated-trading";
 import {
+  createDemoPortfolioLearningInsights,
+  type DemoPortfolioLearningInsights,
+} from "@/services/demo-portfolio-insights";
+import {
   applyDemoSimulatedMarketOrder,
   previewDemoSimulatedMarketOrder,
   type DemoSimulatedOrderPreviewBlock,
@@ -40,6 +44,7 @@ export type DemoPortfolioOrderPreview = {
   positionBefore: number;
   warningMessages: DemoSimulatedOrderPreviewWarning[];
 };
+export type { DemoPortfolioLearningInsights };
 
 function roundCurrency(value: number) {
   return Math.round(value * 100) / 100;
@@ -461,6 +466,20 @@ export function useDemoAccountSummary() {
   const currentRevision = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
   return useMemo(() => createAccountSummary(), [currentRevision]);
+}
+
+export function useDemoPortfolioLearningInsights() {
+  const currentRevision = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+
+  return useMemo(
+    () =>
+      createDemoPortfolioLearningInsights({
+        holdings: portfolioHoldings,
+        ledgerEntries: simulatedLedgerEntries,
+        walletAccounts: walletAccountState,
+      }),
+    [currentRevision],
+  );
 }
 
 export function usePortfolioHolding(symbol: string | undefined) {

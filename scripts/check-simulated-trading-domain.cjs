@@ -23,6 +23,7 @@ Module._extensions[".ts"] = function loadTsModule(module, filename) {
 };
 
 const { SimulatedTradingError, applySimulatedMarketOrder } = require("../src/domain/simulated-trading.ts");
+const { createDemoPortfolioLearningInsights } = require("../src/services/demo-portfolio-insights.ts");
 const { applyDemoSimulatedMarketOrder, previewDemoSimulatedMarketOrder } = require("../src/services/demo-simulated-trading.ts");
 
 const quote = {
@@ -149,6 +150,20 @@ const fixtureWalletAccounts = [
     accent: "#05b83f",
   },
 ];
+
+const emptyLearningInsights = createDemoPortfolioLearningInsights({
+  holdings: [],
+  ledgerEntries: [],
+  walletAccounts: fixtureWalletAccounts,
+});
+
+assert.equal(emptyLearningInsights.positionCount, 0);
+assert.equal(emptyLearningInsights.cashAllocationPercent, 100);
+assert.equal(emptyLearningInsights.recentActivity.entryCount, 0);
+assert.equal(emptyLearningInsights.recentActivity.label, "No simulated ledger entries yet");
+assert.equal(emptyLearningInsights.topExposure, undefined);
+assert.match(emptyLearningInsights.disclosure, /Not financial advice/);
+
 const demoBuy = applyDemoSimulatedMarketOrder(
   {
     holdings: [],
@@ -176,6 +191,16 @@ assert.equal(demoBuy.ledgerEntries.length, 1);
 assert.equal(demoBuy.ledgerEntries[0].amountCents, -10_020);
 assert.equal(demoBuy.order.status, "filled");
 assert.equal(demoBuy.fill.priceCents, 5_010);
+
+const populatedLearningInsights = createDemoPortfolioLearningInsights(demoBuy);
+
+assert.equal(populatedLearningInsights.positionCount, 1);
+assert.equal(populatedLearningInsights.topExposure.symbol, "AMD");
+assert.equal(populatedLearningInsights.topExposure.value, 100);
+assert.equal(populatedLearningInsights.recentActivity.entryCount, 1);
+assert.equal(populatedLearningInsights.recentActivity.label, "Latest simulated ledger");
+assert.match(populatedLearningInsights.recentActivity.summary, /virtual cash debit/);
+assert(populatedLearningInsights.cashAllocationPercent > 80);
 
 const demoPreview = previewDemoSimulatedMarketOrder(
   {

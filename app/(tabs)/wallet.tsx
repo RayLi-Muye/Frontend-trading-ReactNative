@@ -7,11 +7,18 @@ import Animated, { FadeInUp } from "react-native-reanimated";
 import { AccountSummaryCard } from "@/components/account-summary-card";
 import { AppHeader } from "@/components/app-header";
 import { PageTitle } from "@/components/page-title";
+import { PortfolioLearningInsightsPanel } from "@/components/portfolio-learning-insights-panel";
 import { ScreenScroll } from "@/components/screen-scroll";
 import { WalletFloatingActions } from "@/components/wallet-floating-actions";
 import { colors, radius, shadows, spacing } from "@/design/theme";
 import type { SimulatedLedgerEntry } from "@/domain/simulated-trading";
-import { resetDemoState, useDemoAccountSummary, useRecentSimulatedLedgerEntries, useWalletAccounts } from "@/hooks/use-demo-portfolio";
+import {
+  resetDemoState,
+  useDemoAccountSummary,
+  useDemoPortfolioLearningInsights,
+  useRecentSimulatedLedgerEntries,
+  useWalletAccounts,
+} from "@/hooks/use-demo-portfolio";
 import { formatCurrency } from "@/utils/format";
 
 type SimulatedActivitySectionProps = {
@@ -149,6 +156,7 @@ function SimulatedActivitySection({ entries, onReset }: SimulatedActivitySection
 export default function WalletScreen() {
   const walletAccounts = useWalletAccounts();
   const accountSummary = useDemoAccountSummary();
+  const learningInsights = useDemoPortfolioLearningInsights();
   const recentLedgerEntries = useRecentSimulatedLedgerEntries(3);
   const [selectedAccountCode, setSelectedAccountCode] = useState(walletAccounts[0]?.code ?? "USD");
   const [actionsExpanded, setActionsExpanded] = useState(false);
@@ -175,6 +183,8 @@ export default function WalletScreen() {
           summary={accountSummary}
           selectedAccountCode={selectedAccountCode}
         />
+
+        <PortfolioLearningInsightsPanel insights={learningInsights} />
 
         <View style={{ gap: spacing.md }}>
           <Text selectable style={{ color: colors.ink, fontSize: 18, fontWeight: "600" }}>
