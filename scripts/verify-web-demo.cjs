@@ -247,6 +247,11 @@ async function runVerification(client) {
   await waitFor(client, `document.body.innerText.includes('Enter App')`, "launch splash");
   await clickLabel(client, "Enter main interface");
   await waitFor(client, `document.body.innerText.includes('Cash and Holding')`, "home");
+  await waitFor(
+    client,
+    `document.body.innerText.includes('Market Brief') && document.body.innerText.includes('Local demo') && document.body.innerText.includes('Not financial advice')`,
+    "demo market brief",
+  );
 
   await evaluate(client, `localStorage.removeItem('${holdingsKey}'); localStorage.removeItem('${accountsKey}'); localStorage.removeItem('${ledgerKey}');`);
 
