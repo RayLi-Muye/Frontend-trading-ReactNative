@@ -66,3 +66,15 @@ Any future order type beyond immediate simulated market orders needs an explicit
 The adapter is not the production backend. It exists so the current prototype can move toward the production boundary without introducing Supabase, broker routing, market-data provider calls, paid APIs, or credentials.
 
 Current limitation: the domain contract stores quote prices as integer cents. The local adapter rounds demo quote prices to cents, so sub-cent instruments need an explicit price-precision decision before broad trade-ticket adoption.
+
+## Local Order Preview
+
+`previewDemoSimulatedMarketOrder` uses the same domain order application path as the local adapter, but it returns a read-only preview instead of mutating local demo state. The trade ticket can show estimated cost or proceeds, virtual cash after, position after, ledger effect, and guardrails before submission.
+
+Current local guardrails include:
+
+- insufficient virtual funds;
+- overselling beyond the current simulated position;
+- concentration-style warning when a buy order would use more than 25% of current virtual cash.
+
+The preview is educational simulation feedback only. It does not route a real order, reserve funds, call a broker, call an AI API, use credentials, or provide financial advice.

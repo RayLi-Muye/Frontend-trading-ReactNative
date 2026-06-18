@@ -9,7 +9,12 @@ import {
   type WalletAccount,
 } from "@/data/portfolio";
 import type { SimulatedLedgerEntry } from "@/domain/simulated-trading";
-import { applyDemoSimulatedMarketOrder } from "@/services/demo-simulated-trading";
+import {
+  applyDemoSimulatedMarketOrder,
+  previewDemoSimulatedMarketOrder,
+  type DemoSimulatedOrderPreviewBlock,
+  type DemoSimulatedOrderPreviewWarning,
+} from "@/services/demo-simulated-trading";
 
 const holdingsStorageKey = "market-demo-portfolio-holdings-v1";
 const accountsStorageKey = "market-demo-wallet-accounts-v1";
@@ -23,6 +28,17 @@ export type DemoPortfolioTradeResult = {
   fillNotional: number;
   holding?: Holding;
   ledgerEntry: SimulatedLedgerEntry;
+};
+export type DemoPortfolioOrderPreview = {
+  blockingReason?: DemoSimulatedOrderPreviewBlock;
+  canSubmit: boolean;
+  cashAfter: number;
+  cashBefore: number;
+  estimatedNotional: number;
+  ledgerEffect: number;
+  positionAfter: number;
+  positionBefore: number;
+  warningMessages: DemoSimulatedOrderPreviewWarning[];
 };
 
 function roundCurrency(value: number) {
@@ -254,18 +270,35 @@ function createDemoTradeIds(side: "buy" | "sell", symbol: string) {
   };
 }
 
+function createDemoPreviewIds(side: "buy" | "sell", symbol: string) {
+  const normalized = symbol.toLowerCase();
+
+  return {
+    fillId: `demo-preview-fill-${normalized}-${side}`,
+    ledgerEntryId: `demo-preview-ledger-${normalized}-${side}`,
+    orderId: `demo-preview-order-${normalized}-${side}`,
+  };
+}
+
+function createTradeAsset(asset: EquityAsset, side: "buy" | "sell", executionPrice?: number) {
+  return executionPrice && executionPrice > 0
+    ? {
+        ...asset,
+        ask: side === "buy" ? executionPrice : asset.ask,
+        bid: side === "sell" ? executionPrice : asset.bid,
+        price: executionPrice,
+      }
+    : asset;
+}
+
+function centsToDollars(cents: number) {
+  return roundCurrency(cents / 100);
+}
+
 function placeDemoSimulatedOrder(asset: EquityAsset, side: "buy" | "sell", units: number, executionPrice?: number): DemoPortfolioTradeResult | undefined {
   const normalized = asset.symbol.toUpperCase();
   const submittedAt = new Date().toISOString();
-  const tradeAsset =
-    executionPrice && executionPrice > 0
-      ? {
-          ...asset,
-          ask: side === "buy" ? executionPrice : asset.ask,
-          bid: side === "sell" ? executionPrice : asset.bid,
-          price: executionPrice,
-        }
-      : asset;
+  const tradeAsset = createTradeAsset(asset, side, executionPrice);
 
   try {
     const result = applyDemoSimulatedMarketOrder(
@@ -301,6 +334,38 @@ function placeDemoSimulatedOrder(asset: EquityAsset, side: "buy" | "sell", units
   } catch {
     return undefined;
   }
+}
+
+function previewDemoPortfolioOrder(asset: EquityAsset, side: "buy" | "sell", units: number, executionPrice?: number): DemoPortfolioOrderPreview {
+  const normalized = asset.symbol.toUpperCase();
+  const submittedAt = new Date().toISOString();
+  const tradeAsset = createTradeAsset(asset, side, executionPrice);
+  const preview = previewDemoSimulatedMarketOrder(
+    {
+      holdings: portfolioHoldings,
+      ledgerEntries: simulatedLedgerEntries,
+      walletAccounts: walletAccountState,
+    },
+    {
+      asset: tradeAsset,
+      ids: createDemoPreviewIds(side, normalized),
+      quantity: units,
+      side,
+      submittedAt,
+    },
+  );
+
+  return {
+    blockingReason: preview.blockingReason,
+    canSubmit: preview.canSubmit,
+    cashAfter: centsToDollars(preview.cashAfterCents),
+    cashBefore: centsToDollars(preview.cashBeforeCents),
+    estimatedNotional: centsToDollars(preview.estimatedNotionalCents),
+    ledgerEffect: centsToDollars(preview.ledgerEffectCents),
+    positionAfter: preview.positionAfterQuantity,
+    positionBefore: preview.positionBeforeQuantity,
+    warningMessages: preview.warningMessages,
+  };
 }
 
 export function buyPortfolioAsset(asset: EquityAsset, units = 1) {
@@ -432,4 +497,13 @@ export function useRecentSimulatedLedgerEntries(limit = 3) {
 
     return simulatedLedgerEntries.slice(-normalizedLimit).reverse().map((entry) => ({ ...entry }));
   }, [currentRevision, normalizedLimit]);
+}
+
+export function usePortfolioOrderPreview(asset: EquityAsset, side: "buy" | "sell", units: number, executionPrice?: number) {
+  const currentRevision = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+
+  return useMemo(
+    () => previewDemoPortfolioOrder(asset, side, units, executionPrice),
+    [asset, currentRevision, executionPrice, side, units],
+  );
 }

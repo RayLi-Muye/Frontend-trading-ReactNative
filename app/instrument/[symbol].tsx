@@ -22,7 +22,7 @@ import {
 } from "@/data/portfolio";
 import { colors, radius, shadows, spacing } from "@/design/theme";
 import { useAppViewportDimensions } from "@/hooks/use-app-viewport";
-import { buyPortfolioAsset, sellPortfolioAsset, useDemoAccountSummary, usePortfolioHolding } from "@/hooks/use-demo-portfolio";
+import { buyPortfolioAsset, sellPortfolioAsset, useDemoAccountSummary, usePortfolioHolding, usePortfolioOrderPreview } from "@/hooks/use-demo-portfolio";
 import { useLiveAssets } from "@/hooks/use-live-market";
 import { useWatchlistStatus } from "@/hooks/use-watchlist";
 import { formatCurrency, formatPercent, formatPrice, formatSignedCurrency } from "@/utils/format";
@@ -267,6 +267,11 @@ function formatLedgerEffect(entry: SimulatedLedgerEntry) {
   return `Virtual ledger ${sign}${formatCurrency(Math.abs(entry.amountCents) / 100)}`;
 }
 
+function formatPreviewLedgerEffect(value: number) {
+  const label = value < 0 ? "Virtual ledger debit" : "Virtual ledger credit";
+  return `${label} ${formatSignedCurrency(value)}`;
+}
+
 function clampQuantity(value: number, max: number) {
   if (max <= 0) {
     return 0;
@@ -434,15 +439,14 @@ function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding 
   const sellPrice = asset.bid > 0 ? asset.bid : asset.price;
   const marketPrice = side === "buy" ? buyPrice : sellPrice;
   const executionPrice = orderType === "market" ? marketPrice : limitPrice;
+  const orderPreview = usePortfolioOrderPreview(asset, side, quantity, executionPrice);
   const maxBuyUnits = roundTradeValue(accountSummary.availableCash / Math.max(executionPrice, 0.01));
   const maxQuantity = side === "buy" ? maxBuyUnits : availableUnits;
-  const estimatedValue = roundTradeValue(quantity * executionPrice);
-  const buyBlocked = side === "buy" && estimatedValue > accountSummary.availableCash;
-  const sellBlocked = side === "sell" && (!hasPosition || quantity > availableUnits);
-  const canSubmit = quantity > 0 && executionPrice > 0 && !buyBlocked && !sellBlocked;
+  const estimatedValue = orderPreview.estimatedNotional;
+  const canSubmit = orderPreview.canSubmit;
   const sideAccent = side === "buy" ? colors.brandAction : colors.negative;
   const SubmitIcon = side === "buy" ? TrendingUp : TrendingDown;
-  const allocationPercent = maxQuantity > 0 ? quantity / maxQuantity : 0;
+  const allocationPercent = maxQuantity > 0 ? Math.min(quantity / maxQuantity, 1) : 0;
   const bubbleOpacity = useSharedValue(0);
   const bubbleScale = useSharedValue(0.92);
   const bubbleY = useSharedValue(-8);
@@ -490,20 +494,6 @@ function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding 
     setLimitPriceInput(numericInputValue(nextLimitPrice, priceDigits));
   }, [marketPrice, priceDigits]);
 
-  useEffect(() => {
-    if (maxQuantity <= 0 && quantity > 0) {
-      setQuantity(0);
-      setQuantityInput("");
-      return;
-    }
-
-    if (maxQuantity > 0 && quantity > maxQuantity) {
-      const nextQuantity = clampQuantity(quantity, maxQuantity);
-      setQuantity(nextQuantity);
-      setQuantityInput(numericInputValue(nextQuantity));
-    }
-  }, [maxQuantity, quantity]);
-
   function changeQuantity(nextQuantity: number) {
     const clampedQuantity = clampQuantity(nextQuantity, maxQuantity);
     setQuantity(clampedQuantity);
@@ -522,9 +512,8 @@ function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding 
     }
 
     const parsedQuantity = parsePositiveNumber(cleaned);
-    const clampedQuantity = clampQuantity(parsedQuantity, maxQuantity);
-    setQuantity(clampedQuantity);
-    setQuantityInput(parsedQuantity > clampedQuantity ? numericInputValue(clampedQuantity) : cleaned);
+    setQuantity(roundTradeValue(parsedQuantity));
+    setQuantityInput(cleaned);
     setStatusMessage(null);
   }
 
@@ -778,23 +767,46 @@ function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding 
             ) : null}
 
             <View style={{ flexDirection: "row", gap: spacing.md }}>
-              <TicketMetric label="Est. value" value={formatCurrency(estimatedValue)} />
-              <TicketMetric label={side === "buy" ? "Available cash" : "Position"} value={side === "buy" ? formatCurrency(accountSummary.availableCash) : `${formatUnits(availableUnits)} units`} />
+              <TicketMetric label={side === "buy" ? "Est. cost" : "Est. proceeds"} value={formatCurrency(estimatedValue)} />
+              <TicketMetric label="Cash after" tone={orderPreview.cashAfter < 0 ? "negative" : "neutral"} value={formatCurrency(orderPreview.cashAfter)} />
             </View>
             <View style={{ flexDirection: "row", gap: spacing.md }}>
-              <TicketMetric label="Execution" value={orderType === "market" ? "Market" : "Limit"} />
-              <TicketMetric label="Price" value={`$${formatPrice(executionPrice)}`} />
+              <TicketMetric label="Position after" tone={orderPreview.positionAfter < 0 ? "negative" : "neutral"} value={`${formatUnits(orderPreview.positionAfter)} units`} />
+              <TicketMetric label="Ledger effect" tone={orderPreview.ledgerEffect < 0 ? "negative" : "positive"} value={formatPreviewLedgerEffect(orderPreview.ledgerEffect)} />
             </View>
 
-            {!canSubmit ? (
-              <Text selectable style={{ color: colors.negative, fontSize: 12, fontWeight: "500", lineHeight: 17 }}>
-                {buyBlocked
-                  ? "Estimated value is above available cash."
-                  : side === "sell"
-                    ? "Sell is unavailable because this asset is not held in the portfolio."
-                    : "Enter a valid order size."}
+            <View
+              style={{
+                backgroundColor: colors.brandSoft,
+                borderColor: "rgba(5,184,63,0.18)",
+                borderRadius: radius.md,
+                borderWidth: 1,
+                gap: spacing.xs,
+                padding: spacing.md,
+              }}
+            >
+              <Text selectable style={{ color: colors.brandDark, fontSize: 12, fontWeight: "700", textTransform: "uppercase" }}>
+                Order Preview
+              </Text>
+              <Text selectable style={{ color: colors.brandDark, fontSize: 12, fontWeight: "600", lineHeight: 18 }}>
+                Simulated preview only. Not financial advice; no real order will be placed.
+              </Text>
+              <Text selectable style={{ color: colors.muted, fontSize: 12, fontWeight: "500", lineHeight: 18 }}>
+                Execution {orderType === "market" ? "Market" : "Limit"} at ${formatPrice(executionPrice)}
+              </Text>
+            </View>
+
+            {orderPreview.blockingReason ? (
+              <Text selectable style={{ color: colors.negative, fontSize: 12, fontWeight: "600", lineHeight: 17 }}>
+                {orderPreview.blockingReason.message}
               </Text>
             ) : null}
+
+            {orderPreview.warningMessages.map((warning) => (
+              <Text selectable key={warning.code} style={{ color: colors.warningDark, fontSize: 12, fontWeight: "600", lineHeight: 17 }}>
+                {warning.message}
+              </Text>
+            ))}
 
             <Pressable
               accessibilityLabel={`Place ${side} order`}
