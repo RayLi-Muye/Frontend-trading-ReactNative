@@ -8,6 +8,7 @@ import Animated, { Easing, FadeInUp, FadeOutDown, runOnJS, useAnimatedStyle, use
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 
 import { AssetLogo } from "@/components/asset-logo";
+import { InstrumentPositionSummaryPanel } from "@/components/instrument-position-summary-panel";
 import { ScreenScroll } from "@/components/screen-scroll";
 import { Sparkline, type SparklineDatum } from "@/components/sparkline";
 import {
@@ -22,7 +23,14 @@ import {
 } from "@/data/portfolio";
 import { colors, radius, shadows, spacing } from "@/design/theme";
 import { useAppViewportDimensions } from "@/hooks/use-app-viewport";
-import { buyPortfolioAsset, sellPortfolioAsset, useDemoAccountSummary, usePortfolioHolding, usePortfolioOrderPreview } from "@/hooks/use-demo-portfolio";
+import {
+  buyPortfolioAsset,
+  sellPortfolioAsset,
+  useDemoAccountSummary,
+  useInstrumentPositionSummary,
+  usePortfolioHolding,
+  usePortfolioOrderPreview,
+} from "@/hooks/use-demo-portfolio";
 import { useLiveAssets } from "@/hooks/use-live-market";
 import { useWatchlistStatus } from "@/hooks/use-watchlist";
 import { formatCurrency, formatPercent, formatPrice, formatSignedCurrency } from "@/utils/format";
@@ -421,6 +429,7 @@ function AllocationSlider({
 
 function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding }) {
   const accountSummary = useDemoAccountSummary();
+  const positionSummary = useInstrumentPositionSummary(asset);
   const initialLimitPrice = roundTradeValue(asset.ask > 0 ? asset.ask : asset.price);
   const priceDigits = initialLimitPrice < 1 ? 4 : 2;
   const [expanded, setExpanded] = useState(false);
@@ -619,6 +628,8 @@ function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding 
           <ChevronDown color={colors.inverse} size={22} strokeWidth={2.6} />
         </Animated.View>
       </Pressable>
+
+      <InstrumentPositionSummaryPanel summary={positionSummary} />
 
       {panelVisible ? (
         <Animated.View style={[{ gap: spacing.sm, paddingTop: 8, transformOrigin: "top center" } as never, bubbleStyle]}>

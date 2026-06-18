@@ -23,6 +23,7 @@ Module._extensions[".ts"] = function loadTsModule(module, filename) {
 };
 
 const { SimulatedTradingError, applySimulatedMarketOrder } = require("../src/domain/simulated-trading.ts");
+const { createDemoInstrumentPositionSummary } = require("../src/services/demo-instrument-position-summary.ts");
 const { createDemoPortfolioLearningInsights } = require("../src/services/demo-portfolio-insights.ts");
 const { applyDemoSimulatedMarketOrder, previewDemoSimulatedMarketOrder } = require("../src/services/demo-simulated-trading.ts");
 
@@ -164,6 +165,20 @@ assert.equal(emptyLearningInsights.recentActivity.label, "No simulated ledger en
 assert.equal(emptyLearningInsights.topExposure, undefined);
 assert.match(emptyLearningInsights.disclosure, /Not financial advice/);
 
+const emptyInstrumentPositionSummary = createDemoInstrumentPositionSummary({
+  asset: fixtureAsset,
+  holdings: [],
+  ledgerEntries: [],
+  walletAccounts: fixtureWalletAccounts,
+});
+
+assert.equal(emptyInstrumentPositionSummary.hasPosition, false);
+assert.equal(emptyInstrumentPositionSummary.quantity, 0);
+assert.equal(emptyInstrumentPositionSummary.marketValue, 0);
+assert.equal(emptyInstrumentPositionSummary.averageCost, null);
+assert.equal(emptyInstrumentPositionSummary.recentActivity.label, "No simulated activity");
+assert.match(emptyInstrumentPositionSummary.disclosure, /Not financial advice/);
+
 const demoBuy = applyDemoSimulatedMarketOrder(
   {
     holdings: [],
@@ -175,7 +190,7 @@ const demoBuy = applyDemoSimulatedMarketOrder(
     ids: {
       fillId: "demo_fill_buy_1",
       ledgerEntryId: "demo_ledger_buy_1",
-      orderId: "demo_order_buy_1",
+      orderId: "demo-order-1-1-amd-buy",
     },
     quantity: 2,
     side: "buy",
@@ -201,6 +216,23 @@ assert.equal(populatedLearningInsights.recentActivity.entryCount, 1);
 assert.equal(populatedLearningInsights.recentActivity.label, "Latest simulated ledger");
 assert.match(populatedLearningInsights.recentActivity.summary, /virtual cash debit/);
 assert(populatedLearningInsights.cashAllocationPercent > 80);
+
+const populatedInstrumentPositionSummary = createDemoInstrumentPositionSummary({
+  asset: fixtureAsset,
+  holdings: demoBuy.holdings,
+  ledgerEntries: demoBuy.ledgerEntries,
+  walletAccounts: demoBuy.walletAccounts,
+});
+
+assert.equal(populatedInstrumentPositionSummary.hasPosition, true);
+assert.equal(populatedInstrumentPositionSummary.quantity, 2);
+assert.equal(populatedInstrumentPositionSummary.marketValue, 100);
+assert.equal(populatedInstrumentPositionSummary.costBasis, 100);
+assert.equal(populatedInstrumentPositionSummary.averageCost, 50);
+assert.equal(populatedInstrumentPositionSummary.unrealizedPnl, 0);
+assert(populatedInstrumentPositionSummary.allocationPercent > 9);
+assert.equal(populatedInstrumentPositionSummary.recentActivity.label, "Latest simulated activity");
+assert.match(populatedInstrumentPositionSummary.recentActivity.summary, /AMD simulated buy/);
 
 const demoPreview = previewDemoSimulatedMarketOrder(
   {

@@ -282,6 +282,11 @@ async function runVerification(client) {
 
   await navigate(client, "/instrument/NFLX");
   await waitFor(client, `document.body.innerText.includes('NFLX') && document.body.innerText.includes('Trade')`, "NFLX detail");
+  await waitFor(
+    client,
+    `document.body.innerText.includes('Simulated Position') && document.body.innerText.includes('No simulated position') && document.body.innerText.includes('No simulated activity') && document.body.innerText.includes('Not financial advice')`,
+    "NFLX empty simulated position summary",
+  );
   await clickLabel(client, "Open trade choices");
   await waitFor(
     client,
@@ -305,6 +310,11 @@ async function runVerification(client) {
   await waitFor(client, `document.body.innerText.includes('Simulated preview only') && document.body.innerText.includes('Place Buy Order')`, "buy ticket");
   await clickLabel(client, "Place buy order");
   await waitFor(client, `document.body.innerText.includes('Simulated buy filled') && document.body.innerText.includes('Virtual ledger')`, "simulated buy confirmation");
+  await waitFor(
+    client,
+    `document.body.innerText.includes('Simulated Position') && document.body.innerText.includes('NVDA local learning summary') && document.body.innerText.includes('Quantity') && document.body.innerText.includes('Market value') && document.body.innerText.includes('Avg cost') && document.body.innerText.includes('Latest simulated activity') && document.body.innerText.includes('Not financial advice')`,
+    "NVDA populated simulated position summary",
+  );
   const holdingsAfterBuy = await storedHoldings(client);
   const accountsAfterBuy = await storedAccounts(client);
   assert(holdingsAfterBuy.some((holding) => holding.symbol === "NVDA"), "NVDA should be added to portfolio after buy.");
