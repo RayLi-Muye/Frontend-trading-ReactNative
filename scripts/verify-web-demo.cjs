@@ -332,7 +332,30 @@ async function runVerification(client) {
   assert(await evaluate(client, `document.querySelector('[aria-label="Place sell order"]')?.disabled === true`), "Sell should be disabled for unheld AMD.");
 
   await navigate(client, "/watchlist");
-  await waitFor(client, `document.body.innerText.includes('Watch List') && document.body.innerText.includes('Market')`, "watch list");
+  await waitFor(
+    client,
+    `document.body.innerText.includes('Watch List') && document.body.innerText.includes('Market') && document.body.innerText.includes('Compare Watchlist') && document.body.innerText.includes('Pinned 5 of 5 demo symbols') && document.body.innerText.includes('NVDA Held') && document.body.innerText.includes('MSFT Held') && document.body.innerText.includes('Local watchlist comparison only') && document.body.innerText.includes('Not financial advice')`,
+    "watchlist compare default and holding status",
+  );
+  await waitFor(
+    client,
+    `[...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Remove META from compare') && [...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Add BTC to compare') && [...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Open NVDA compare detail')`,
+    "watchlist compare controls",
+  );
+  await clickLabel(client, "Remove META from compare");
+  await waitFor(
+    client,
+    `document.body.innerText.includes('Pinned 4 of 5 demo symbols') && [...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Add META to compare')`,
+    "watchlist compare remove",
+  );
+  await clickLabel(client, "Add BTC to compare");
+  await waitFor(
+    client,
+    `document.body.innerText.includes('Pinned 5 of 5 demo symbols') && document.body.innerText.includes('BTC Not held') && [...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Remove BTC from compare')`,
+    "watchlist compare add",
+  );
+  await clickLabel(client, "Open NVDA compare detail");
+  await waitFor(client, `document.body.innerText.includes('NVDA') && document.body.innerText.includes('Trade')`, "watchlist compare instrument path");
 
   await navigate(client, "/wallet");
   await waitFor(
