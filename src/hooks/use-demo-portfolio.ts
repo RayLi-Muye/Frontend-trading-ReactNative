@@ -14,6 +14,11 @@ import {
   type DemoInstrumentPositionSummary,
 } from "@/services/demo-instrument-position-summary";
 import {
+  createDemoPerformanceRecap,
+  type DemoPerformanceContribution,
+  type DemoPerformanceRecap,
+} from "@/services/demo-performance-recap";
+import {
   createDemoPortfolioLearningInsights,
   type DemoPortfolioLearningInsights,
 } from "@/services/demo-portfolio-insights";
@@ -56,6 +61,7 @@ export type DemoPortfolioOrderPreview = {
   warningMessages: DemoSimulatedOrderPreviewWarning[];
 };
 export type { DemoInstrumentPositionSummary };
+export type { DemoPerformanceContribution, DemoPerformanceRecap };
 export type { DemoPortfolioLearningInsights };
 export type { DemoTradeJournal, DemoTradeJournalAction, DemoTradeJournalFilter, DemoTradeJournalFilterValue };
 
@@ -487,6 +493,20 @@ export function useDemoPortfolioLearningInsights() {
   return useMemo(
     () =>
       createDemoPortfolioLearningInsights({
+        holdings: portfolioHoldings,
+        ledgerEntries: simulatedLedgerEntries,
+        walletAccounts: walletAccountState,
+      }),
+    [currentRevision],
+  );
+}
+
+export function useDemoPerformanceRecap() {
+  const currentRevision = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+
+  return useMemo(
+    () =>
+      createDemoPerformanceRecap({
         holdings: portfolioHoldings,
         ledgerEntries: simulatedLedgerEntries,
         walletAccounts: walletAccountState,

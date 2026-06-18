@@ -7,6 +7,7 @@ import Animated, { FadeInUp } from "react-native-reanimated";
 import { AccountSummaryCard } from "@/components/account-summary-card";
 import { AppHeader } from "@/components/app-header";
 import { PageTitle } from "@/components/page-title";
+import { PerformanceRecapPanel } from "@/components/performance-recap-panel";
 import { PortfolioLearningInsightsPanel } from "@/components/portfolio-learning-insights-panel";
 import { ScreenScroll } from "@/components/screen-scroll";
 import { TradeJournalRecapPanel } from "@/components/trade-journal-recap-panel";
@@ -16,6 +17,7 @@ import type { SimulatedLedgerEntry } from "@/domain/simulated-trading";
 import {
   resetDemoState,
   useDemoAccountSummary,
+  useDemoPerformanceRecap,
   useDemoPortfolioLearningInsights,
   useDemoTradeJournal,
   useRecentSimulatedLedgerEntries,
@@ -160,6 +162,7 @@ function SimulatedActivitySection({ entries, onReset }: SimulatedActivitySection
 export default function WalletScreen() {
   const walletAccounts = useWalletAccounts();
   const accountSummary = useDemoAccountSummary();
+  const performanceRecap = useDemoPerformanceRecap();
   const learningInsights = useDemoPortfolioLearningInsights();
   const recentLedgerEntries = useRecentSimulatedLedgerEntries(3);
   const [selectedAccountCode, setSelectedAccountCode] = useState(walletAccounts[0]?.code ?? "USD");
@@ -192,6 +195,8 @@ export default function WalletScreen() {
           summary={accountSummary}
           selectedAccountCode={selectedAccountCode}
         />
+
+        <PerformanceRecapPanel recap={performanceRecap} />
 
         <PortfolioLearningInsightsPanel insights={learningInsights} />
 

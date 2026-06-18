@@ -24,6 +24,7 @@ Module._extensions[".ts"] = function loadTsModule(module, filename) {
 
 const { SimulatedTradingError, applySimulatedMarketOrder } = require("../src/domain/simulated-trading.ts");
 const { createDemoInstrumentPositionSummary } = require("../src/services/demo-instrument-position-summary.ts");
+const { createDemoPerformanceRecap } = require("../src/services/demo-performance-recap.ts");
 const { createDemoPortfolioLearningInsights } = require("../src/services/demo-portfolio-insights.ts");
 const { applyDemoSimulatedMarketOrder, previewDemoSimulatedMarketOrder } = require("../src/services/demo-simulated-trading.ts");
 const { createDemoTradeJournal } = require("../src/services/demo-trade-journal.ts");
@@ -189,6 +190,19 @@ assert.equal(emptyTradeJournal.entries.length, 0);
 assert.equal(emptyTradeJournal.emptyMessage, "No simulated journal entries yet.");
 assert.match(emptyTradeJournal.disclosure, /Not financial advice/);
 
+const emptyPerformanceRecap = createDemoPerformanceRecap({
+  holdings: [],
+  ledgerEntries: [],
+  walletAccounts: fixtureWalletAccounts,
+});
+
+assert.equal(emptyPerformanceRecap.currentAccountValue, 1_000);
+assert.equal(emptyPerformanceRecap.cashAllocationPercent, 100);
+assert.equal(emptyPerformanceRecap.positionsAllocationPercent, 0);
+assert.equal(emptyPerformanceRecap.timeline[0].label, "Starting demo state");
+assert.equal(emptyPerformanceRecap.bestContribution, undefined);
+assert.match(emptyPerformanceRecap.disclosure, /Not financial advice/);
+
 const demoBuy = applyDemoSimulatedMarketOrder(
   {
     holdings: [],
@@ -226,6 +240,17 @@ assert.equal(populatedLearningInsights.recentActivity.entryCount, 1);
 assert.equal(populatedLearningInsights.recentActivity.label, "Latest simulated ledger");
 assert.match(populatedLearningInsights.recentActivity.summary, /virtual cash debit/);
 assert(populatedLearningInsights.cashAllocationPercent > 80);
+
+const populatedPerformanceRecap = createDemoPerformanceRecap(demoBuy);
+
+assert.equal(populatedPerformanceRecap.cashValue, 899.8);
+assert.equal(populatedPerformanceRecap.positionsValue, 100);
+assert.equal(populatedPerformanceRecap.currentAccountValue, 999.8);
+assert.equal(populatedPerformanceRecap.timeline[0].label, "Virtual cash debit");
+assert.equal(populatedPerformanceRecap.timeline[0].accountValue, 999.8);
+assert.equal(populatedPerformanceRecap.bestContribution.symbol, "AMD");
+assert.equal(populatedPerformanceRecap.worstContribution.symbol, "AMD");
+assert.match(populatedPerformanceRecap.disclosure, /Not financial advice/);
 
 const populatedInstrumentPositionSummary = createDemoInstrumentPositionSummary({
   asset: fixtureAsset,
