@@ -23,6 +23,12 @@ import {
   type DemoPortfolioLearningInsights,
 } from "@/services/demo-portfolio-insights";
 import {
+  createDemoPositionSizingCoach,
+  type DemoPositionSizingCoach,
+  type DemoPositionSizingCoachCheckTone,
+  type DemoPositionSizingGuardrail,
+} from "@/services/demo-position-sizing-coach";
+import {
   applyDemoSimulatedMarketOrder,
   previewDemoSimulatedMarketOrder,
   type DemoSimulatedOrderPreviewBlock,
@@ -63,6 +69,7 @@ export type DemoPortfolioOrderPreview = {
 export type { DemoInstrumentPositionSummary };
 export type { DemoPerformanceContribution, DemoPerformanceRecap };
 export type { DemoPortfolioLearningInsights };
+export type { DemoPositionSizingCoach, DemoPositionSizingCoachCheckTone, DemoPositionSizingGuardrail };
 export type { DemoTradeJournal, DemoTradeJournalAction, DemoTradeJournalFilter, DemoTradeJournalFilterValue };
 
 function roundCurrency(value: number) {
@@ -543,6 +550,22 @@ export function useInstrumentPositionSummary(asset: EquityAsset) {
         walletAccounts: walletAccountState,
       }),
     [asset, currentRevision],
+  );
+}
+
+export function usePositionSizingCoach(asset: EquityAsset, side: "buy" | "sell", orderPreview: DemoPortfolioOrderPreview) {
+  const currentRevision = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+
+  return useMemo(
+    () =>
+      createDemoPositionSizingCoach({
+        asset,
+        holdings: portfolioHoldings,
+        orderPreview,
+        side,
+        walletAccounts: walletAccountState,
+      }),
+    [asset, currentRevision, orderPreview, side],
   );
 }
 
