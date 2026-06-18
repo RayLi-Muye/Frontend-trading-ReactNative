@@ -26,6 +26,7 @@ const { SimulatedTradingError, applySimulatedMarketOrder } = require("../src/dom
 const { createDemoInstrumentPositionSummary } = require("../src/services/demo-instrument-position-summary.ts");
 const { createDemoPortfolioLearningInsights } = require("../src/services/demo-portfolio-insights.ts");
 const { applyDemoSimulatedMarketOrder, previewDemoSimulatedMarketOrder } = require("../src/services/demo-simulated-trading.ts");
+const { createDemoTradeJournal } = require("../src/services/demo-trade-journal.ts");
 
 const quote = {
   symbol: "NVDA",
@@ -179,6 +180,14 @@ assert.equal(emptyInstrumentPositionSummary.averageCost, null);
 assert.equal(emptyInstrumentPositionSummary.recentActivity.label, "No simulated activity");
 assert.match(emptyInstrumentPositionSummary.disclosure, /Not financial advice/);
 
+const emptyTradeJournal = createDemoTradeJournal({
+  ledgerEntries: [],
+});
+
+assert.equal(emptyTradeJournal.entries.length, 0);
+assert.equal(emptyTradeJournal.emptyMessage, "No simulated journal entries yet.");
+assert.match(emptyTradeJournal.disclosure, /Not financial advice/);
+
 const demoBuy = applyDemoSimulatedMarketOrder(
   {
     holdings: [],
@@ -233,6 +242,36 @@ assert.equal(populatedInstrumentPositionSummary.unrealizedPnl, 0);
 assert(populatedInstrumentPositionSummary.allocationPercent > 9);
 assert.equal(populatedInstrumentPositionSummary.recentActivity.label, "Latest simulated activity");
 assert.match(populatedInstrumentPositionSummary.recentActivity.summary, /AMD simulated buy/);
+
+const buyTradeJournal = createDemoTradeJournal({
+  filter: { action: "buy", symbol: "AMD" },
+  ledgerEntries: demoBuy.ledgerEntries,
+});
+
+assert.equal(buyTradeJournal.entries.length, 1);
+assert.equal(buyTradeJournal.entries[0].symbol, "AMD");
+assert.equal(buyTradeJournal.entries[0].action, "buy");
+assert(buyTradeJournal.entries[0].cashFlow < 0);
+assert.match(buyTradeJournal.entries[0].cashFlowLabel, /debit/);
+assert.match(buyTradeJournal.entries[0].positionImpact, /increased/);
+assert.match(buyTradeJournal.entries[0].recapPrompt, /Entry recap checklist/);
+assert.deepEqual(buyTradeJournal.filterOptions.symbols, ["AMD"]);
+assert.deepEqual(buyTradeJournal.filterOptions.actions, ["buy"]);
+
+const allFilteredTradeJournal = createDemoTradeJournal({
+  filter: { action: "all", symbol: "all" },
+  ledgerEntries: demoBuy.ledgerEntries,
+});
+
+assert.equal(allFilteredTradeJournal.entries.length, 1);
+assert.equal(allFilteredTradeJournal.entries[0].symbol, "AMD");
+
+const sellFilteredTradeJournal = createDemoTradeJournal({
+  filter: { action: "sell", symbol: "AMD" },
+  ledgerEntries: demoBuy.ledgerEntries,
+});
+
+assert.equal(sellFilteredTradeJournal.entries.length, 0);
 
 const demoPreview = previewDemoSimulatedMarketOrder(
   {
@@ -289,7 +328,7 @@ const demoSell = applyDemoSimulatedMarketOrder(demoBuy, {
   ids: {
     fillId: "demo_fill_sell_1",
     ledgerEntryId: "demo_ledger_sell_1",
-    orderId: "demo_order_sell_1",
+    orderId: "demo-order-1-2-amd-sell",
   },
   quantity: 0.5,
   side: "sell",
@@ -303,6 +342,18 @@ assert.deepEqual(demoSell.holdings.map(({ symbol, units, value }) => ({ symbol, 
 assert.equal(demoSell.ledgerEntries.length, 2);
 assert.equal(demoSell.ledgerEntries[1].type, "virtual_cash_credit");
 assert.equal(demoSell.ledgerEntries[1].amountCents, 2_495);
+
+const sellTradeJournal = createDemoTradeJournal({
+  filter: { action: "sell", symbol: "amd" },
+  ledgerEntries: demoSell.ledgerEntries,
+});
+
+assert.equal(sellTradeJournal.entries.length, 1);
+assert.equal(sellTradeJournal.entries[0].action, "sell");
+assert.equal(sellTradeJournal.entries[0].cashFlow, 24.95);
+assert.match(sellTradeJournal.entries[0].cashFlowLabel, /credit/);
+assert.match(sellTradeJournal.entries[0].positionImpact, /reduced or closed/);
+assert.match(sellTradeJournal.entries[0].recapPrompt, /Exit recap checklist/);
 
 const oversellPreview = previewDemoSimulatedMarketOrder(demoSell, {
   asset: fixtureAsset,

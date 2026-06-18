@@ -262,7 +262,7 @@ async function runVerification(client) {
   await navigate(client, "/wallet");
   await waitFor(
     client,
-    `document.body.innerText.includes('Wallet') && document.body.innerText.includes('USD Account') && document.body.innerText.includes('Learning Insights') && document.body.innerText.includes('Cash allocation') && document.body.innerText.includes('Top exposure') && document.body.innerText.includes('No simulated ledger entries yet') && document.body.innerText.includes('Not financial advice')`,
+    `document.body.innerText.includes('Wallet') && document.body.innerText.includes('USD Account') && document.body.innerText.includes('Learning Insights') && document.body.innerText.includes('Cash allocation') && document.body.innerText.includes('Top exposure') && document.body.innerText.includes('Trade Journal') && document.body.innerText.includes('No simulated journal entries yet') && document.body.innerText.includes('No simulated ledger entries yet') && document.body.innerText.includes('Not financial advice')`,
     "wallet learning insights",
   );
   await clickLabel(client, "Open USD wallet actions");
@@ -337,16 +337,28 @@ async function runVerification(client) {
   await navigate(client, "/wallet");
   await waitFor(
     client,
-    `document.body.innerText.includes('Wallet') && document.body.innerText.includes('Learning Insights') && document.body.innerText.includes('Latest simulated ledger') && document.body.innerText.includes('Simulated Activity') && document.body.innerText.includes('Virtual cash debit') && document.body.innerText.includes('Balance after')`,
+    `document.body.innerText.includes('Wallet') && document.body.innerText.includes('Learning Insights') && document.body.innerText.includes('Latest simulated ledger') && document.body.innerText.includes('Trade Journal') && document.body.innerText.includes('Entry recap checklist') && document.body.innerText.includes('Virtual cash flow debit') && document.body.innerText.includes('Simulated Activity') && document.body.innerText.includes('Virtual cash debit') && document.body.innerText.includes('Balance after')`,
     "wallet simulated activity",
   );
   const ledgerAfterBuy = await storedLedgerEntries(client);
   assert(ledgerAfterBuy.length === 1, "Wallet activity should reflect the simulated buy ledger entry.");
+  await waitFor(
+    client,
+    `[...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Filter journal buy') && [...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Filter journal nvda')`,
+    "journal filters",
+  );
+  await clickLabel(client, "Filter journal buy");
+  await clickLabel(client, "Filter journal nvda");
+  await waitFor(
+    client,
+    `document.body.innerText.includes('Showing NVDA buys') && document.body.innerText.includes('NVDA Buy') && document.body.innerText.includes('Entry recap checklist')`,
+    "filtered trade journal recap",
+  );
 
   await clickLabel(client, "Reset demo state");
   await waitFor(
     client,
-    `document.body.innerText.includes('No simulated trades yet') && document.body.innerText.includes('No simulated ledger entries yet') && document.body.innerText.includes('Not financial advice')`,
+    `document.body.innerText.includes('No simulated trades yet') && document.body.innerText.includes('No simulated journal entries yet') && document.body.innerText.includes('No simulated ledger entries yet') && document.body.innerText.includes('Not financial advice')`,
     "wallet reset empty activity",
   );
   const ledgerAfterReset = await storedLedgerEntries(client);

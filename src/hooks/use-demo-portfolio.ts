@@ -23,6 +23,13 @@ import {
   type DemoSimulatedOrderPreviewBlock,
   type DemoSimulatedOrderPreviewWarning,
 } from "@/services/demo-simulated-trading";
+import {
+  createDemoTradeJournal,
+  type DemoTradeJournal,
+  type DemoTradeJournalAction,
+  type DemoTradeJournalFilter,
+  type DemoTradeJournalFilterValue,
+} from "@/services/demo-trade-journal";
 
 const holdingsStorageKey = "market-demo-portfolio-holdings-v1";
 const accountsStorageKey = "market-demo-wallet-accounts-v1";
@@ -50,6 +57,7 @@ export type DemoPortfolioOrderPreview = {
 };
 export type { DemoInstrumentPositionSummary };
 export type { DemoPortfolioLearningInsights };
+export type { DemoTradeJournal, DemoTradeJournalAction, DemoTradeJournalFilter, DemoTradeJournalFilterValue };
 
 function roundCurrency(value: number) {
   return Math.round(value * 100) / 100;
@@ -484,6 +492,22 @@ export function useDemoPortfolioLearningInsights() {
         walletAccounts: walletAccountState,
       }),
     [currentRevision],
+  );
+}
+
+export function useDemoTradeJournal(filter: DemoTradeJournalFilter = {}) {
+  const currentRevision = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  const action = filter.action ?? "all";
+  const symbol = filter.symbol ?? "all";
+
+  return useMemo(
+    () =>
+      createDemoTradeJournal({
+        filter: { action, symbol },
+        ledgerEntries: simulatedLedgerEntries,
+        limit: 6,
+      }),
+    [action, currentRevision, symbol],
   );
 }
 
