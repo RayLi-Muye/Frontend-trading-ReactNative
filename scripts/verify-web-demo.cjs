@@ -290,7 +290,7 @@ async function runVerification(client) {
   await clickLabel(client, "Open trade choices");
   await waitFor(
     client,
-    `document.body.innerText.includes('Simulated preview only') && document.body.innerText.includes('Concentration warning') && document.body.innerText.includes('Not financial advice')`,
+    `document.body.innerText.includes('Practice Sizing Checklist') && document.body.innerText.includes('CASH IMPACT') && document.body.innerText.includes('SIZE VS ACCOUNT') && document.body.innerText.includes('PROJECTED ALLOCATION') && document.body.innerText.includes('Preview guardrails') && document.body.innerText.includes('Simulated preview only') && document.body.innerText.includes('Concentration warning') && document.body.innerText.includes('Not financial advice')`,
     "concentration preview",
   );
 
@@ -299,7 +299,7 @@ async function runVerification(client) {
   await clickLabel(client, "Open trade choices");
   await waitFor(
     client,
-    `document.body.innerText.includes('Simulated preview only') && document.body.innerText.includes('Insufficient virtual funds') && document.body.innerText.includes('Virtual ledger debit')`,
+    `document.body.innerText.includes('Practice Sizing Checklist') && document.body.innerText.includes('Simulated preview only') && document.body.innerText.includes('Insufficient virtual funds') && document.body.innerText.includes('Virtual ledger debit')`,
     "insufficient funds preview",
   );
   assert(await evaluate(client, `document.querySelector('[aria-label="Place buy order"]')?.disabled === true`), "Buy should be disabled when the preview has insufficient virtual funds.");
@@ -307,7 +307,11 @@ async function runVerification(client) {
   await navigate(client, "/instrument/NVDA");
   await waitFor(client, `document.body.innerText.includes('NVDA') && document.body.innerText.includes('Trade')`, "NVDA detail");
   await clickLabel(client, "Open trade choices");
-  await waitFor(client, `document.body.innerText.includes('Simulated preview only') && document.body.innerText.includes('Place Buy Order')`, "buy ticket");
+  await waitFor(
+    client,
+    `document.body.innerText.includes('Practice Sizing Checklist') && document.body.innerText.includes('Simulated preview only') && document.body.innerText.includes('Place Buy Order')`,
+    "buy ticket",
+  );
   await clickLabel(client, "Place buy order");
   await waitFor(client, `document.body.innerText.includes('Simulated buy filled') && document.body.innerText.includes('Virtual ledger')`, "simulated buy confirmation");
   await waitFor(
@@ -328,7 +332,11 @@ async function runVerification(client) {
   await clickLabel(client, "Open trade choices");
   await waitFor(client, `document.body.innerText.includes('Place Buy Order')`, "AMD ticket");
   await evaluate(client, `[...document.querySelectorAll('[role="button"]')].find((node) => node.textContent === 'Sell')?.click()`);
-  await waitFor(client, `document.body.innerText.includes('Oversell guardrail')`, "AMD oversell preview");
+  await waitFor(
+    client,
+    `document.body.innerText.includes('Practice Sizing Checklist') && document.body.innerText.includes('Oversell guardrail')`,
+    "AMD oversell preview",
+  );
   assert(await evaluate(client, `document.querySelector('[aria-label="Place sell order"]')?.disabled === true`), "Sell should be disabled for unheld AMD.");
 
   await navigate(client, "/watchlist");

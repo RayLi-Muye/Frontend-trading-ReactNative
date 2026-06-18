@@ -9,6 +9,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 
 import { AssetLogo } from "@/components/asset-logo";
 import { InstrumentPositionSummaryPanel } from "@/components/instrument-position-summary-panel";
+import { PositionSizingCoachPanel } from "@/components/position-sizing-coach-panel";
 import { ScreenScroll } from "@/components/screen-scroll";
 import { Sparkline, type SparklineDatum } from "@/components/sparkline";
 import {
@@ -30,6 +31,7 @@ import {
   useInstrumentPositionSummary,
   usePortfolioHolding,
   usePortfolioOrderPreview,
+  usePositionSizingCoach,
 } from "@/hooks/use-demo-portfolio";
 import { useLiveAssets } from "@/hooks/use-live-market";
 import { useWatchlistStatus } from "@/hooks/use-watchlist";
@@ -449,6 +451,7 @@ function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding 
   const marketPrice = side === "buy" ? buyPrice : sellPrice;
   const executionPrice = orderType === "market" ? marketPrice : limitPrice;
   const orderPreview = usePortfolioOrderPreview(asset, side, quantity, executionPrice);
+  const sizingCoach = usePositionSizingCoach(asset, side, orderPreview);
   const maxBuyUnits = roundTradeValue(accountSummary.availableCash / Math.max(executionPrice, 0.01));
   const maxQuantity = side === "buy" ? maxBuyUnits : availableUnits;
   const estimatedValue = orderPreview.estimatedNotional;
@@ -785,6 +788,8 @@ function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding 
               <TicketMetric label="Position after" tone={orderPreview.positionAfter < 0 ? "negative" : "neutral"} value={`${formatUnits(orderPreview.positionAfter)} units`} />
               <TicketMetric label="Ledger effect" tone={orderPreview.ledgerEffect < 0 ? "negative" : "positive"} value={formatPreviewLedgerEffect(orderPreview.ledgerEffect)} />
             </View>
+
+            <PositionSizingCoachPanel coach={sizingCoach} />
 
             <View
               style={{

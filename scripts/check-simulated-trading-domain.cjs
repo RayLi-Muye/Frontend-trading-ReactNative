@@ -26,6 +26,7 @@ const { SimulatedTradingError, applySimulatedMarketOrder } = require("../src/dom
 const { createDemoInstrumentPositionSummary } = require("../src/services/demo-instrument-position-summary.ts");
 const { createDemoPerformanceRecap } = require("../src/services/demo-performance-recap.ts");
 const { createDemoPortfolioLearningInsights } = require("../src/services/demo-portfolio-insights.ts");
+const { createDemoPositionSizingCoach } = require("../src/services/demo-position-sizing-coach.ts");
 const { applyDemoSimulatedMarketOrder, previewDemoSimulatedMarketOrder } = require("../src/services/demo-simulated-trading.ts");
 const { createDemoTradeJournal } = require("../src/services/demo-trade-journal.ts");
 const { createDemoWatchlistCompare } = require("../src/services/demo-watchlist-compare.ts");
@@ -154,6 +155,20 @@ const fixtureWalletAccounts = [
     accent: "#05b83f",
   },
 ];
+
+function previewForSizingCoach(preview) {
+  return {
+    blockingReason: preview.blockingReason,
+    canSubmit: preview.canSubmit,
+    cashAfter: preview.cashAfterCents / 100,
+    cashBefore: preview.cashBeforeCents / 100,
+    estimatedNotional: preview.estimatedNotionalCents / 100,
+    ledgerEffect: preview.ledgerEffectCents / 100,
+    positionAfter: preview.positionAfterQuantity,
+    positionBefore: preview.positionBeforeQuantity,
+    warningMessages: preview.warningMessages,
+  };
+}
 
 const emptyLearningInsights = createDemoPortfolioLearningInsights({
   holdings: [],
@@ -355,6 +370,23 @@ assert.equal(demoPreview.positionBeforeQuantity, 0);
 assert.equal(demoPreview.positionAfterQuantity, 6);
 assert.equal(demoPreview.warningMessages[0].code, "CONCENTRATION");
 
+const buySizingCoach = createDemoPositionSizingCoach({
+  asset: fixtureAsset,
+  holdings: [],
+  orderPreview: previewForSizingCoach(demoPreview),
+  side: "buy",
+  walletAccounts: fixtureWalletAccounts,
+});
+
+assert.equal(buySizingCoach.checks[0].label, "Cash impact");
+assert.equal(buySizingCoach.checks[1].label, "Size vs account");
+assert.equal(buySizingCoach.checks[2].label, "Projected allocation");
+assert.equal(buySizingCoach.positionSizePercent, 30.1);
+assert.equal(buySizingCoach.projectedAllocationPercent, 30.1);
+assert.equal(buySizingCoach.hasBlockingGuardrail, false);
+assert.match(buySizingCoach.guardrails[0].message, /Concentration warning/);
+assert.match(buySizingCoach.disclosure, /Not financial advice/);
+
 const insufficientPreview = previewDemoSimulatedMarketOrder(
   {
     holdings: [],
@@ -376,6 +408,18 @@ const insufficientPreview = previewDemoSimulatedMarketOrder(
 
 assert.equal(insufficientPreview.canSubmit, false);
 assert.equal(insufficientPreview.blockingReason.code, "INSUFFICIENT_VIRTUAL_FUNDS");
+
+const insufficientSizingCoach = createDemoPositionSizingCoach({
+  asset: fixtureAsset,
+  holdings: [],
+  orderPreview: previewForSizingCoach(insufficientPreview),
+  side: "buy",
+  walletAccounts: fixtureWalletAccounts,
+});
+
+assert.equal(insufficientSizingCoach.hasBlockingGuardrail, true);
+assert(insufficientSizingCoach.guardrails.some((guardrail) => /Insufficient virtual funds/.test(guardrail.message)));
+assert(insufficientSizingCoach.guardrails.some((guardrail) => /Concentration warning/.test(guardrail.message)));
 
 const demoSell = applyDemoSimulatedMarketOrder(demoBuy, {
   asset: fixtureAsset,
@@ -423,5 +467,18 @@ const oversellPreview = previewDemoSimulatedMarketOrder(demoSell, {
 
 assert.equal(oversellPreview.canSubmit, false);
 assert.equal(oversellPreview.blockingReason.code, "INSUFFICIENT_POSITION");
+
+const oversellSizingCoach = createDemoPositionSizingCoach({
+  asset: fixtureAsset,
+  holdings: demoSell.holdings,
+  orderPreview: previewForSizingCoach(oversellPreview),
+  side: "sell",
+  walletAccounts: demoSell.walletAccounts,
+});
+
+assert.equal(oversellSizingCoach.hasBlockingGuardrail, true);
+assert.match(oversellSizingCoach.checks[0].value, /^\+\$/);
+assert(oversellSizingCoach.guardrails.some((guardrail) => /Oversell guardrail/.test(guardrail.message)));
+assert.match(oversellSizingCoach.disclosure, /Not financial advice/);
 
 console.log("Simulated trading domain and demo service checks passed.");
