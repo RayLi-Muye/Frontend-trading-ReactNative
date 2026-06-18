@@ -26,6 +26,7 @@ import { buyPortfolioAsset, sellPortfolioAsset, useDemoAccountSummary, usePortfo
 import { useLiveAssets } from "@/hooks/use-live-market";
 import { useWatchlistStatus } from "@/hooks/use-watchlist";
 import { formatCurrency, formatPercent, formatPrice, formatSignedCurrency } from "@/utils/format";
+import type { SimulatedLedgerEntry } from "@/domain/simulated-trading";
 
 type MetricTone = "positive" | "negative" | "neutral";
 
@@ -259,6 +260,11 @@ function formatUnits(value: number) {
     maximumFractionDigits: 2,
     minimumFractionDigits: 2,
   });
+}
+
+function formatLedgerEffect(entry: SimulatedLedgerEntry) {
+  const sign = entry.amountCents < 0 ? "-" : "+";
+  return `Virtual ledger ${sign}${formatCurrency(Math.abs(entry.amountCents) / 100)}`;
 }
 
 function clampQuantity(value: number, max: number) {
@@ -554,26 +560,34 @@ function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding 
     }
 
     if (side === "buy") {
-      const nextHolding = buyPortfolioAsset({ ...asset, ask: executionPrice }, quantity);
-      if (!nextHolding) {
+      const tradeResult = buyPortfolioAsset({ ...asset, ask: executionPrice }, quantity);
+      if (!tradeResult) {
         setStatusMessage(`Order rejected · ${formatCurrency(estimatedValue)} exceeds available cash`);
         return;
       }
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-      setStatusMessage(`Buy filled · ${asset.symbol} ${formatUnits(quantity)} units · ${formatCurrency(estimatedValue)}`);
+      setStatusMessage(
+        `Simulated buy filled · ${asset.symbol} ${formatUnits(quantity)} units · ${formatCurrency(tradeResult.fillNotional)} · ${formatLedgerEffect(tradeResult.ledgerEntry)}`,
+      );
       setQuantity(1);
       setQuantityInput(numericInputValue(1));
       setExpanded(false);
       return;
     }
 
-    const nextHolding = sellPortfolioAsset(asset.symbol, quantity, executionPrice);
+    const tradeResult = sellPortfolioAsset(asset.symbol, quantity, executionPrice);
+
+    if (!tradeResult) {
+      setStatusMessage(`Order rejected · ${asset.symbol} position is unavailable`);
+      return;
+    }
+
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     setStatusMessage(
-      nextHolding
-        ? `Sell filled · ${asset.symbol} ${formatUnits(quantity)} units · ${formatCurrency(estimatedValue)}`
-        : `Position closed · ${asset.symbol} · ${formatCurrency(estimatedValue)}`,
+      tradeResult.holding
+        ? `Simulated sell filled · ${asset.symbol} ${formatUnits(quantity)} units · ${formatCurrency(tradeResult.fillNotional)} · ${formatLedgerEffect(tradeResult.ledgerEntry)}`
+        : `Simulated position closed · ${asset.symbol} · ${formatCurrency(tradeResult.fillNotional)} · ${formatLedgerEffect(tradeResult.ledgerEntry)}`,
     );
     setQuantity(1);
     setQuantityInput(numericInputValue(1));
