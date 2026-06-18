@@ -1,26 +1,29 @@
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const Module = require("node:module");
 const path = require("node:path");
 const ts = require("typescript");
 
-const sourcePath = path.join(__dirname, "..", "src", "domain", "simulated-trading.ts");
-const transpiled = ts.transpileModule(require("node:fs").readFileSync(sourcePath, "utf8"), {
-  compilerOptions: {
-    module: ts.ModuleKind.CommonJS,
-    target: ts.ScriptTarget.ES2022,
-    strict: true,
-  },
-  fileName: sourcePath,
-  reportDiagnostics: true,
-});
+const compilerOptions = {
+  module: ts.ModuleKind.CommonJS,
+  target: ts.ScriptTarget.ES2022,
+  strict: true,
+};
 
-const diagnostics = transpiled.diagnostics || [];
-assert.equal(diagnostics.length, 0, diagnostics.map((diagnostic) => diagnostic.messageText).join("\n"));
+Module._extensions[".ts"] = function loadTsModule(module, filename) {
+  const transpiled = ts.transpileModule(fs.readFileSync(filename, "utf8"), {
+    compilerOptions,
+    fileName: filename,
+    reportDiagnostics: true,
+  });
+  const diagnostics = transpiled.diagnostics || [];
 
-const moduleShim = { exports: {} };
-const runModule = new Function("exports", "require", "module", "__filename", "__dirname", transpiled.outputText);
-runModule(moduleShim.exports, require, moduleShim, sourcePath, path.dirname(sourcePath));
+  assert.equal(diagnostics.length, 0, diagnostics.map((diagnostic) => diagnostic.messageText).join("\n"));
+  module._compile(transpiled.outputText, filename);
+};
 
-const { SimulatedTradingError, applySimulatedMarketOrder } = moduleShim.exports;
+const { SimulatedTradingError, applySimulatedMarketOrder } = require("../src/domain/simulated-trading.ts");
+const { applyDemoSimulatedMarketOrder } = require("../src/services/demo-simulated-trading.ts");
 
 const quote = {
   symbol: "NVDA",
@@ -124,4 +127,74 @@ assert.throws(
   (error) => error instanceof SimulatedTradingError && error.code === "INSUFFICIENT_POSITION",
 );
 
-console.log("Simulated trading domain contract check passed.");
+const fixtureAsset = {
+  symbol: "AMD",
+  name: "Advanced Micro Devices",
+  price: 50,
+  change: 1.2,
+  changePercent: 2.46,
+  bid: 49.9,
+  ask: 50.1,
+  logoLabel: "AMD",
+  logoBackground: "#303236",
+  logoColor: "#ffffff",
+  sparkline: [48, 49, 50],
+};
+const fixtureWalletAccounts = [
+  {
+    code: "USD",
+    name: "US Dollar",
+    balance: 1_000,
+    available: 1_000,
+    accent: "#05b83f",
+  },
+];
+const demoBuy = applyDemoSimulatedMarketOrder(
+  {
+    holdings: [],
+    ledgerEntries: [],
+    walletAccounts: fixtureWalletAccounts,
+  },
+  {
+    asset: fixtureAsset,
+    ids: {
+      fillId: "demo_fill_buy_1",
+      ledgerEntryId: "demo_ledger_buy_1",
+      orderId: "demo_order_buy_1",
+    },
+    quantity: 2,
+    side: "buy",
+    submittedAt: "2026-06-17T15:00:00.000Z",
+  },
+);
+
+assert.equal(demoBuy.walletAccounts[0].available, 899.8);
+assert.deepEqual(demoBuy.holdings.map(({ symbol, units, value }) => ({ symbol, units, value })), [
+  { symbol: "AMD", units: 2, value: 100 },
+]);
+assert.equal(demoBuy.ledgerEntries.length, 1);
+assert.equal(demoBuy.ledgerEntries[0].amountCents, -10_020);
+assert.equal(demoBuy.order.status, "filled");
+assert.equal(demoBuy.fill.priceCents, 5_010);
+
+const demoSell = applyDemoSimulatedMarketOrder(demoBuy, {
+  asset: fixtureAsset,
+  ids: {
+    fillId: "demo_fill_sell_1",
+    ledgerEntryId: "demo_ledger_sell_1",
+    orderId: "demo_order_sell_1",
+  },
+  quantity: 0.5,
+  side: "sell",
+  submittedAt: "2026-06-17T15:01:00.000Z",
+});
+
+assert.equal(demoSell.walletAccounts[0].available, 924.75);
+assert.deepEqual(demoSell.holdings.map(({ symbol, units, value }) => ({ symbol, units, value })), [
+  { symbol: "AMD", units: 1.5, value: 75 },
+]);
+assert.equal(demoSell.ledgerEntries.length, 2);
+assert.equal(demoSell.ledgerEntries[1].type, "virtual_cash_credit");
+assert.equal(demoSell.ledgerEntries[1].amountCents, 2_495);
+
+console.log("Simulated trading domain and demo service checks passed.");
