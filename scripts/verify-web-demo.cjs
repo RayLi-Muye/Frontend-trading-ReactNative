@@ -260,7 +260,11 @@ async function runVerification(client) {
   assert(await evaluate(client, `document.body.innerText.includes('Top Movers')`), "Discover should show Top Movers.");
 
   await navigate(client, "/wallet");
-  await waitFor(client, `document.body.innerText.includes('Wallet') && document.body.innerText.includes('USD Account')`, "wallet");
+  await waitFor(
+    client,
+    `document.body.innerText.includes('Wallet') && document.body.innerText.includes('USD Account') && document.body.innerText.includes('Learning Insights') && document.body.innerText.includes('Cash allocation') && document.body.innerText.includes('Top exposure') && document.body.innerText.includes('No simulated ledger entries yet') && document.body.innerText.includes('Not financial advice')`,
+    "wallet learning insights",
+  );
   await clickLabel(client, "Open USD wallet actions");
   await waitFor(client, `[...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Deposit USD')`, "wallet actions");
   await clickLabel(client, "Deposit USD");
@@ -323,14 +327,18 @@ async function runVerification(client) {
   await navigate(client, "/wallet");
   await waitFor(
     client,
-    `document.body.innerText.includes('Wallet') && document.body.innerText.includes('Simulated Activity') && document.body.innerText.includes('Virtual cash debit') && document.body.innerText.includes('Balance after')`,
+    `document.body.innerText.includes('Wallet') && document.body.innerText.includes('Learning Insights') && document.body.innerText.includes('Latest simulated ledger') && document.body.innerText.includes('Simulated Activity') && document.body.innerText.includes('Virtual cash debit') && document.body.innerText.includes('Balance after')`,
     "wallet simulated activity",
   );
   const ledgerAfterBuy = await storedLedgerEntries(client);
   assert(ledgerAfterBuy.length === 1, "Wallet activity should reflect the simulated buy ledger entry.");
 
   await clickLabel(client, "Reset demo state");
-  await waitFor(client, `document.body.innerText.includes('No simulated trades yet')`, "wallet reset empty activity");
+  await waitFor(
+    client,
+    `document.body.innerText.includes('No simulated trades yet') && document.body.innerText.includes('No simulated ledger entries yet') && document.body.innerText.includes('Not financial advice')`,
+    "wallet reset empty activity",
+  );
   const ledgerAfterReset = await storedLedgerEntries(client);
   const accountsAfterReset = await storedAccounts(client);
   const holdingsAfterReset = await storedHoldings(client);
