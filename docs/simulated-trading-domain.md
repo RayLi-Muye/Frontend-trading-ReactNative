@@ -58,3 +58,11 @@ Production backend work should preserve this boundary while replacing local stat
 - Portfolio snapshots from positions and market data.
 
 Any future order type beyond immediate simulated market orders needs an explicit product and ledger model before implementation.
+
+## Local Demo Adapter
+
+`src/services/demo-simulated-trading.ts` is a local adapter for the existing Expo demo state. It converts demo wallet accounts and holdings into `SimulatedAccountState`, submits a simulated market order through `applySimulatedMarketOrder`, and returns updated wallet accounts, holdings, order, fill, and accumulated virtual-cash ledger entries.
+
+The adapter is not the production backend. It exists so the current prototype can move toward the production boundary without introducing Supabase, broker routing, market-data provider calls, paid APIs, or credentials.
+
+Current limitation: the domain contract stores quote prices as integer cents. The local adapter rounds demo quote prices to cents, so sub-cent instruments need an explicit price-precision decision before broad trade-ticket adoption.
