@@ -8,14 +8,22 @@ import {
   type Holding,
   type WalletAccount,
 } from "@/data/portfolio";
+import type { SimulatedLedgerEntry } from "@/domain/simulated-trading";
+import { applyDemoSimulatedMarketOrder } from "@/services/demo-simulated-trading";
 
 const holdingsStorageKey = "market-demo-portfolio-holdings-v1";
 const accountsStorageKey = "market-demo-wallet-accounts-v1";
-const tradeDateLabel = "Today";
+const ledgerStorageKey = "market-demo-simulated-ledger-v1";
 let revision = 0;
+let tradeSequence = 0;
 const listeners = new Set<() => void>();
 
 export type DemoAccountSummary = typeof initialAccountSummary;
+export type DemoPortfolioTradeResult = {
+  fillNotional: number;
+  holding?: Holding;
+  ledgerEntry: SimulatedLedgerEntry;
+};
 
 function roundCurrency(value: number) {
   return Math.round(value * 100) / 100;
@@ -57,6 +65,25 @@ function isWalletAccount(value: unknown): value is WalletAccount {
     typeof candidate.balance === "number" &&
     typeof candidate.available === "number" &&
     typeof candidate.accent === "string"
+  );
+}
+
+function isSimulatedLedgerEntry(value: unknown): value is SimulatedLedgerEntry {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Partial<SimulatedLedgerEntry>;
+  return (
+    typeof candidate.id === "string" &&
+    typeof candidate.accountId === "string" &&
+    typeof candidate.orderId === "string" &&
+    typeof candidate.fillId === "string" &&
+    (candidate.type === "virtual_cash_debit" || candidate.type === "virtual_cash_credit") &&
+    candidate.currency === "USD" &&
+    typeof candidate.amountCents === "number" &&
+    typeof candidate.balanceAfterCents === "number" &&
+    typeof candidate.occurredAt === "string"
   );
 }
 
@@ -108,6 +135,30 @@ function loadStoredWalletAccounts() {
   }
 }
 
+function loadStoredLedgerEntries() {
+  if (typeof localStorage === "undefined") {
+    return [];
+  }
+
+  try {
+    const stored = localStorage.getItem(ledgerStorageKey);
+
+    if (!stored) {
+      return [];
+    }
+
+    const parsed = JSON.parse(stored);
+
+    if (!Array.isArray(parsed) || !parsed.every(isSimulatedLedgerEntry)) {
+      return [];
+    }
+
+    return parsed.map((entry) => ({ ...entry }));
+  } catch {
+    return [];
+  }
+}
+
 function persistDemoState() {
   if (typeof localStorage === "undefined") {
     return;
@@ -116,6 +167,7 @@ function persistDemoState() {
   try {
     localStorage.setItem(holdingsStorageKey, JSON.stringify(portfolioHoldings));
     localStorage.setItem(accountsStorageKey, JSON.stringify(walletAccountState));
+    localStorage.setItem(ledgerStorageKey, JSON.stringify(simulatedLedgerEntries));
   } catch {
     // In private browsing or restricted storage contexts, the in-memory demo store still works.
   }
@@ -123,6 +175,7 @@ function persistDemoState() {
 
 let portfolioHoldings = loadStoredHoldings();
 let walletAccountState = loadStoredWalletAccounts();
+let simulatedLedgerEntries = loadStoredLedgerEntries();
 
 function subscribe(listener: () => void) {
   listeners.add(listener);
@@ -169,8 +222,9 @@ function adjustWalletCash(code: string, delta: number) {
   return changed;
 }
 
-function adjustUsdCash(delta: number) {
-  adjustWalletCash("USD", delta);
+function getHolding(symbol: string) {
+  const normalized = symbol.toUpperCase();
+  return portfolioHoldings.find((holding) => holding.symbol.toUpperCase() === normalized);
 }
 
 function createAccountSummary(): DemoAccountSummary {
@@ -188,93 +242,89 @@ function createAccountSummary(): DemoAccountSummary {
   };
 }
 
-function createHolding(asset: EquityAsset, units: number): Holding {
-  const tradePrice = asset.ask > 0 ? asset.ask : asset.price;
+function createDemoTradeIds(side: "buy" | "sell", symbol: string) {
+  tradeSequence += 1;
+  const normalized = symbol.toLowerCase();
+  const suffix = `${Date.now()}-${tradeSequence}-${normalized}-${side}`;
 
   return {
-    ...asset,
-    dateLabel: tradeDateLabel,
-    pnl: 0,
-    units,
-    value: roundCurrency(tradePrice * units),
+    fillId: `demo-fill-${suffix}`,
+    ledgerEntryId: `demo-ledger-${suffix}`,
+    orderId: `demo-order-${suffix}`,
   };
 }
 
-export function buyPortfolioAsset(asset: EquityAsset, units = 1) {
+function placeDemoSimulatedOrder(asset: EquityAsset, side: "buy" | "sell", units: number, executionPrice?: number): DemoPortfolioTradeResult | undefined {
   const normalized = asset.symbol.toUpperCase();
+  const submittedAt = new Date().toISOString();
+  const tradeAsset =
+    executionPrice && executionPrice > 0
+      ? {
+          ...asset,
+          ask: side === "buy" ? executionPrice : asset.ask,
+          bid: side === "sell" ? executionPrice : asset.bid,
+          price: executionPrice,
+        }
+      : asset;
+
+  try {
+    const result = applyDemoSimulatedMarketOrder(
+      {
+        holdings: portfolioHoldings,
+        ledgerEntries: simulatedLedgerEntries,
+        walletAccounts: walletAccountState,
+      },
+      {
+        asset: tradeAsset,
+        ids: createDemoTradeIds(side, normalized),
+        quantity: units,
+        side,
+        submittedAt,
+      },
+    );
+    const ledgerEntry = result.ledgerEntries[result.ledgerEntries.length - 1];
+
+    if (!ledgerEntry) {
+      return undefined;
+    }
+
+    portfolioHoldings = result.holdings;
+    walletAccountState = result.walletAccounts;
+    simulatedLedgerEntries = result.ledgerEntries;
+    emitChange();
+
+    return {
+      fillNotional: result.fill.notionalCents / 100,
+      holding: getHolding(normalized),
+      ledgerEntry,
+    };
+  } catch {
+    return undefined;
+  }
+}
+
+export function buyPortfolioAsset(asset: EquityAsset, units = 1) {
   const tradePrice = asset.ask > 0 ? asset.ask : asset.price;
   const tradeCost = roundCurrency(tradePrice * units);
   const usdAccount = getUsdAccount();
-  let nextHolding: Holding | undefined;
 
   if (tradeCost <= 0 || !usdAccount || usdAccount.available + 0.005 < tradeCost) {
     return undefined;
   }
 
-  portfolioHoldings = portfolioHoldings.map((holding) => {
-    if (holding.symbol.toUpperCase() !== normalized) {
-      return holding;
-    }
-
-    nextHolding = {
-      ...holding,
-      ask: asset.ask,
-      bid: asset.bid,
-      change: asset.change,
-      changePercent: asset.changePercent,
-      price: asset.price,
-      sparkline: asset.sparkline,
-      units: roundCurrency(holding.units + units),
-      value: roundCurrency(holding.value + tradePrice * units),
-    };
-    return nextHolding;
-  });
-
-  if (!nextHolding) {
-    nextHolding = createHolding(asset, units);
-    portfolioHoldings = [...portfolioHoldings, nextHolding];
-  }
-
-  adjustUsdCash(-tradeCost);
-  emitChange();
-  return nextHolding;
+  return placeDemoSimulatedOrder(asset, "buy", units, tradePrice);
 }
 
 export function sellPortfolioAsset(symbol: string, units = 1, executionPrice?: number) {
   const normalized = symbol.toUpperCase();
-  let nextHolding: Holding | undefined;
-  let proceeds = 0;
-  let changed = false;
+  const holding = getHolding(normalized);
 
-  portfolioHoldings = portfolioHoldings.flatMap((holding) => {
-    if (holding.symbol.toUpperCase() !== normalized) {
-      return [holding];
-    }
-
-    changed = true;
-    const sellUnits = Math.min(units, holding.units);
-    const tradePrice = executionPrice && executionPrice > 0 ? executionPrice : holding.bid > 0 ? holding.bid : holding.price;
-    proceeds = roundCurrency(tradePrice * sellUnits);
-    const remainingUnits = roundCurrency(holding.units - sellUnits);
-
-    if (remainingUnits <= 0) {
-      return [];
-    }
-
-    nextHolding = {
-      ...holding,
-      units: remainingUnits,
-      value: roundCurrency(holding.price * remainingUnits),
-    };
-    return [nextHolding];
-  });
-
-  if (changed) {
-    adjustUsdCash(proceeds);
-    emitChange();
+  if (!holding) {
+    return undefined;
   }
 
-  return nextHolding;
+  const tradePrice = executionPrice && executionPrice > 0 ? executionPrice : holding.bid > 0 ? holding.bid : holding.price;
+  return placeDemoSimulatedOrder(holding, "sell", units, tradePrice);
 }
 
 export function depositWalletFunds(code: string, amount: number) {
@@ -352,4 +402,13 @@ export function usePortfolioHolding(symbol: string | undefined) {
     const holding = portfolioHoldings.find((item) => item.symbol.toUpperCase() === normalized);
     return holding ? { ...holding } : undefined;
   }, [currentRevision, normalized]);
+}
+
+export function useLatestSimulatedLedgerEntry() {
+  const currentRevision = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+
+  return useMemo(() => {
+    const entry = simulatedLedgerEntries[simulatedLedgerEntries.length - 1];
+    return entry ? { ...entry } : undefined;
+  }, [currentRevision]);
 }

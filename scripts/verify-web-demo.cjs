@@ -11,6 +11,7 @@ const remoteBaseUrl = process.env.VERIFY_WEB_BASE_URL?.replace(/\/$/, "");
 const baseUrl = remoteBaseUrl ?? `http://127.0.0.1:${port}`;
 const holdingsKey = "market-demo-portfolio-holdings-v1";
 const accountsKey = "market-demo-wallet-accounts-v1";
+const ledgerKey = "market-demo-simulated-ledger-v1";
 
 const chromeCandidates = [
   process.env.CHROME_PATH,
@@ -243,7 +244,7 @@ async function runVerification(client) {
   await clickLabel(client, "Enter main interface");
   await waitFor(client, `document.body.innerText.includes('Cash and Holding')`, "home");
 
-  await evaluate(client, `localStorage.removeItem('${holdingsKey}'); localStorage.removeItem('${accountsKey}');`);
+  await evaluate(client, `localStorage.removeItem('${holdingsKey}'); localStorage.removeItem('${accountsKey}'); localStorage.removeItem('${ledgerKey}');`);
 
   await navigate(client, "/discover");
   await waitFor(client, `document.body.innerText.includes('Discover') && document.body.innerText.includes('Financial Business')`, "discover content");
@@ -271,7 +272,7 @@ async function runVerification(client) {
   await clickLabel(client, "Open trade choices");
   await waitFor(client, `document.body.innerText.includes('Available cash') && document.body.innerText.includes('Place Buy Order')`, "buy ticket");
   await clickLabel(client, "Place buy order");
-  await waitFor(client, `document.body.innerText.includes('Buy filled')`, "buy confirmation");
+  await waitFor(client, `document.body.innerText.includes('Simulated buy filled') && document.body.innerText.includes('Virtual ledger')`, "simulated buy confirmation");
   const holdingsAfterBuy = await storedHoldings(client);
   const accountsAfterBuy = await storedAccounts(client);
   assert(holdingsAfterBuy.some((holding) => holding.symbol === "NVDA"), "NVDA should be added to portfolio after buy.");
