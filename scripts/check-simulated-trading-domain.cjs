@@ -23,7 +23,7 @@ Module._extensions[".ts"] = function loadTsModule(module, filename) {
 };
 
 const { SimulatedTradingError, applySimulatedMarketOrder } = require("../src/domain/simulated-trading.ts");
-const { applyDemoSimulatedMarketOrder } = require("../src/services/demo-simulated-trading.ts");
+const { applyDemoSimulatedMarketOrder, previewDemoSimulatedMarketOrder } = require("../src/services/demo-simulated-trading.ts");
 
 const quote = {
   symbol: "NVDA",
@@ -177,6 +177,56 @@ assert.equal(demoBuy.ledgerEntries[0].amountCents, -10_020);
 assert.equal(demoBuy.order.status, "filled");
 assert.equal(demoBuy.fill.priceCents, 5_010);
 
+const demoPreview = previewDemoSimulatedMarketOrder(
+  {
+    holdings: [],
+    ledgerEntries: [],
+    walletAccounts: fixtureWalletAccounts,
+  },
+  {
+    asset: fixtureAsset,
+    ids: {
+      fillId: "demo_preview_fill_buy_1",
+      ledgerEntryId: "demo_preview_ledger_buy_1",
+      orderId: "demo_preview_order_buy_1",
+    },
+    quantity: 6,
+    side: "buy",
+    submittedAt: "2026-06-17T15:00:30.000Z",
+  },
+);
+
+assert.equal(demoPreview.canSubmit, true);
+assert.equal(demoPreview.estimatedNotionalCents, 30_060);
+assert.equal(demoPreview.cashBeforeCents, 100_000);
+assert.equal(demoPreview.cashAfterCents, 69_940);
+assert.equal(demoPreview.ledgerEffectCents, -30_060);
+assert.equal(demoPreview.positionBeforeQuantity, 0);
+assert.equal(demoPreview.positionAfterQuantity, 6);
+assert.equal(demoPreview.warningMessages[0].code, "CONCENTRATION");
+
+const insufficientPreview = previewDemoSimulatedMarketOrder(
+  {
+    holdings: [],
+    ledgerEntries: [],
+    walletAccounts: fixtureWalletAccounts,
+  },
+  {
+    asset: fixtureAsset,
+    ids: {
+      fillId: "demo_preview_fill_reject_cash",
+      ledgerEntryId: "demo_preview_ledger_reject_cash",
+      orderId: "demo_preview_order_reject_cash",
+    },
+    quantity: 40,
+    side: "buy",
+    submittedAt: "2026-06-17T15:00:45.000Z",
+  },
+);
+
+assert.equal(insufficientPreview.canSubmit, false);
+assert.equal(insufficientPreview.blockingReason.code, "INSUFFICIENT_VIRTUAL_FUNDS");
+
 const demoSell = applyDemoSimulatedMarketOrder(demoBuy, {
   asset: fixtureAsset,
   ids: {
@@ -196,5 +246,20 @@ assert.deepEqual(demoSell.holdings.map(({ symbol, units, value }) => ({ symbol, 
 assert.equal(demoSell.ledgerEntries.length, 2);
 assert.equal(demoSell.ledgerEntries[1].type, "virtual_cash_credit");
 assert.equal(demoSell.ledgerEntries[1].amountCents, 2_495);
+
+const oversellPreview = previewDemoSimulatedMarketOrder(demoSell, {
+  asset: fixtureAsset,
+  ids: {
+    fillId: "demo_preview_fill_reject_position",
+    ledgerEntryId: "demo_preview_ledger_reject_position",
+    orderId: "demo_preview_order_reject_position",
+  },
+  quantity: 5,
+  side: "sell",
+  submittedAt: "2026-06-17T15:02:00.000Z",
+});
+
+assert.equal(oversellPreview.canSubmit, false);
+assert.equal(oversellPreview.blockingReason.code, "INSUFFICIENT_POSITION");
 
 console.log("Simulated trading domain and demo service checks passed.");
