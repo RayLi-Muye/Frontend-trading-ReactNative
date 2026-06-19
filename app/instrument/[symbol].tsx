@@ -8,8 +8,6 @@ import Animated, { Easing, FadeInUp, FadeOutDown, runOnJS, useAnimatedStyle, use
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 
 import { AssetLogo } from "@/components/asset-logo";
-import { InstrumentPositionSummaryPanel } from "@/components/instrument-position-summary-panel";
-import { PositionSizingCoachPanel } from "@/components/position-sizing-coach-panel";
 import { ScreenScroll } from "@/components/screen-scroll";
 import { Sparkline, type SparklineDatum } from "@/components/sparkline";
 import {
@@ -28,10 +26,8 @@ import {
   buyPortfolioAsset,
   sellPortfolioAsset,
   useDemoAccountSummary,
-  useInstrumentPositionSummary,
   usePortfolioHolding,
   usePortfolioOrderPreview,
-  usePositionSizingCoach,
 } from "@/hooks/use-demo-portfolio";
 import { useLiveAssets } from "@/hooks/use-live-market";
 import { useWatchlistStatus } from "@/hooks/use-watchlist";
@@ -431,7 +427,6 @@ function AllocationSlider({
 
 function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding }) {
   const accountSummary = useDemoAccountSummary();
-  const positionSummary = useInstrumentPositionSummary(asset);
   const initialLimitPrice = roundTradeValue(asset.ask > 0 ? asset.ask : asset.price);
   const priceDigits = initialLimitPrice < 1 ? 4 : 2;
   const [expanded, setExpanded] = useState(false);
@@ -451,7 +446,6 @@ function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding 
   const marketPrice = side === "buy" ? buyPrice : sellPrice;
   const executionPrice = orderType === "market" ? marketPrice : limitPrice;
   const orderPreview = usePortfolioOrderPreview(asset, side, quantity, executionPrice);
-  const sizingCoach = usePositionSizingCoach(asset, side, orderPreview);
   const maxBuyUnits = roundTradeValue(accountSummary.availableCash / Math.max(executionPrice, 0.01));
   const maxQuantity = side === "buy" ? maxBuyUnits : availableUnits;
   const estimatedValue = orderPreview.estimatedNotional;
@@ -632,8 +626,6 @@ function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding 
         </Animated.View>
       </Pressable>
 
-      <InstrumentPositionSummaryPanel summary={positionSummary} />
-
       {panelVisible ? (
         <Animated.View style={[{ gap: spacing.sm, paddingTop: 8, transformOrigin: "top center" } as never, bubbleStyle]}>
           <View
@@ -788,8 +780,6 @@ function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding 
               <TicketMetric label="Position after" tone={orderPreview.positionAfter < 0 ? "negative" : "neutral"} value={`${formatUnits(orderPreview.positionAfter)} units`} />
               <TicketMetric label="Ledger effect" tone={orderPreview.ledgerEffect < 0 ? "negative" : "positive"} value={formatPreviewLedgerEffect(orderPreview.ledgerEffect)} />
             </View>
-
-            <PositionSizingCoachPanel coach={sizingCoach} />
 
             <View
               style={{

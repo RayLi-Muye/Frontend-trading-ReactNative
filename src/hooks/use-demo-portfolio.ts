@@ -10,37 +10,11 @@ import {
 } from "@/data/portfolio";
 import type { SimulatedLedgerEntry } from "@/domain/simulated-trading";
 import {
-  createDemoInstrumentPositionSummary,
-  type DemoInstrumentPositionSummary,
-} from "@/services/demo-instrument-position-summary";
-import {
-  createDemoPerformanceRecap,
-  type DemoPerformanceContribution,
-  type DemoPerformanceRecap,
-} from "@/services/demo-performance-recap";
-import {
-  createDemoPortfolioLearningInsights,
-  type DemoPortfolioLearningInsights,
-} from "@/services/demo-portfolio-insights";
-import {
-  createDemoPositionSizingCoach,
-  type DemoPositionSizingCoach,
-  type DemoPositionSizingCoachCheckTone,
-  type DemoPositionSizingGuardrail,
-} from "@/services/demo-position-sizing-coach";
-import {
   applyDemoSimulatedMarketOrder,
   previewDemoSimulatedMarketOrder,
   type DemoSimulatedOrderPreviewBlock,
   type DemoSimulatedOrderPreviewWarning,
 } from "@/services/demo-simulated-trading";
-import {
-  createDemoTradeJournal,
-  type DemoTradeJournal,
-  type DemoTradeJournalAction,
-  type DemoTradeJournalFilter,
-  type DemoTradeJournalFilterValue,
-} from "@/services/demo-trade-journal";
 
 const holdingsStorageKey = "market-demo-portfolio-holdings-v1";
 const accountsStorageKey = "market-demo-wallet-accounts-v1";
@@ -66,11 +40,6 @@ export type DemoPortfolioOrderPreview = {
   positionBefore: number;
   warningMessages: DemoSimulatedOrderPreviewWarning[];
 };
-export type { DemoInstrumentPositionSummary };
-export type { DemoPerformanceContribution, DemoPerformanceRecap };
-export type { DemoPortfolioLearningInsights };
-export type { DemoPositionSizingCoach, DemoPositionSizingCoachCheckTone, DemoPositionSizingGuardrail };
-export type { DemoTradeJournal, DemoTradeJournalAction, DemoTradeJournalFilter, DemoTradeJournalFilterValue };
 
 function roundCurrency(value: number) {
   return Math.round(value * 100) / 100;
@@ -494,81 +463,6 @@ export function useDemoAccountSummary() {
   return useMemo(() => createAccountSummary(), [currentRevision]);
 }
 
-export function useDemoPortfolioLearningInsights() {
-  const currentRevision = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-
-  return useMemo(
-    () =>
-      createDemoPortfolioLearningInsights({
-        holdings: portfolioHoldings,
-        ledgerEntries: simulatedLedgerEntries,
-        walletAccounts: walletAccountState,
-      }),
-    [currentRevision],
-  );
-}
-
-export function useDemoPerformanceRecap() {
-  const currentRevision = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-
-  return useMemo(
-    () =>
-      createDemoPerformanceRecap({
-        holdings: portfolioHoldings,
-        ledgerEntries: simulatedLedgerEntries,
-        walletAccounts: walletAccountState,
-      }),
-    [currentRevision],
-  );
-}
-
-export function useDemoTradeJournal(filter: DemoTradeJournalFilter = {}) {
-  const currentRevision = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-  const action = filter.action ?? "all";
-  const symbol = filter.symbol ?? "all";
-
-  return useMemo(
-    () =>
-      createDemoTradeJournal({
-        filter: { action, symbol },
-        ledgerEntries: simulatedLedgerEntries,
-        limit: 6,
-      }),
-    [action, currentRevision, symbol],
-  );
-}
-
-export function useInstrumentPositionSummary(asset: EquityAsset) {
-  const currentRevision = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-
-  return useMemo(
-    () =>
-      createDemoInstrumentPositionSummary({
-        asset,
-        holdings: portfolioHoldings,
-        ledgerEntries: simulatedLedgerEntries,
-        walletAccounts: walletAccountState,
-      }),
-    [asset, currentRevision],
-  );
-}
-
-export function usePositionSizingCoach(asset: EquityAsset, side: "buy" | "sell", orderPreview: DemoPortfolioOrderPreview) {
-  const currentRevision = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-
-  return useMemo(
-    () =>
-      createDemoPositionSizingCoach({
-        asset,
-        holdings: portfolioHoldings,
-        orderPreview,
-        side,
-        walletAccounts: walletAccountState,
-      }),
-    [asset, currentRevision, orderPreview, side],
-  );
-}
-
 export function usePortfolioHolding(symbol: string | undefined) {
   const currentRevision = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
   const normalized = symbol?.toUpperCase();
@@ -581,28 +475,6 @@ export function usePortfolioHolding(symbol: string | undefined) {
     const holding = portfolioHoldings.find((item) => item.symbol.toUpperCase() === normalized);
     return holding ? { ...holding } : undefined;
   }, [currentRevision, normalized]);
-}
-
-export function useLatestSimulatedLedgerEntry() {
-  const currentRevision = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-
-  return useMemo(() => {
-    const entry = simulatedLedgerEntries[simulatedLedgerEntries.length - 1];
-    return entry ? { ...entry } : undefined;
-  }, [currentRevision]);
-}
-
-export function useRecentSimulatedLedgerEntries(limit = 3) {
-  const currentRevision = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-  const normalizedLimit = Number.isFinite(limit) ? Math.max(0, Math.floor(limit)) : 0;
-
-  return useMemo(() => {
-    if (normalizedLimit === 0) {
-      return [];
-    }
-
-    return simulatedLedgerEntries.slice(-normalizedLimit).reverse().map((entry) => ({ ...entry }));
-  }, [currentRevision, normalizedLimit]);
 }
 
 export function usePortfolioOrderPreview(asset: EquityAsset, side: "buy" | "sell", units: number, executionPrice?: number) {
