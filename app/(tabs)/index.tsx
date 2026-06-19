@@ -2,7 +2,6 @@ import { View } from "react-native";
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 
 import { AppHeader } from "@/components/app-header";
-import { DemoMarketBriefPanel } from "@/components/demo-market-brief-panel";
 import { HomeValueChart } from "@/components/home-value-chart";
 import { MarketIndexStrip } from "@/components/market-index-strip";
 import { MoverCard } from "@/components/mover-card";
@@ -33,8 +32,6 @@ export default function HomeScreen() {
       <AppHeader rewardLabel="Earn $200" />
 
       <HomeValueChart />
-
-      <DemoMarketBriefPanel />
 
       <MoverCard />
 

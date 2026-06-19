@@ -22,9 +22,9 @@ Live demo: [demo-trading-reactnative-ray.vercel.app](https://demo-trading-reactn
 
 - A mobile trading-style interface built with Expo SDK 55, React Native 0.83, React 19, and Expo Router.
 - Local simulated market orders with immediate simulated fills, virtual-cash ledger entries, holdings, and position updates.
-- Trade-ticket learning feedback: order preview, cash impact, position after, ledger effect, guardrails, position sizing checklist, and simulated-only disclosure.
-- Portfolio learning surfaces: virtual account summary, performance recap, activity ledger, trade journal, position summary, and watchlist comparison.
-- A deterministic local market brief provider that shows market-context copy and non-financial-advice disclosure without calling an AI API.
+- Lean trade-ticket feedback: order preview, cash impact, position after, ledger effect, guardrails, and simulated-only disclosure.
+- Portfolio and wallet surfaces for virtual account balances, holdings, quote rows, and local state updates without heavy learning panels.
+- Local service seams for future market briefings and learning feedback without calling an AI API.
 - Web preview modes for phone, tablet, and wide tablet review through a Vercel-hosted React Native Web build.
 
 The product direction is real market data plus virtual funds. The current repo implementation uses local demo market data and local demo state; future production work should move market data, simulated accounts, orders, fills, positions, and ledger records behind backend-owned APIs.
@@ -84,7 +84,7 @@ npm run export:web
 npm run verify:web-demo
 ```
 
-The web smoke test covers launch flow, market brief disclosure, wallet interactions, simulated trade submission, insufficient-cash and oversell guardrails, portfolio updates, watchlist comparison, trade journal reset, and preview shell behavior.
+The web smoke test covers launch flow, wallet interactions, simulated trade submission, insufficient-cash and oversell guardrails, portfolio updates, watchlist quote rows, and preview shell behavior.
 
 To validate an already deployed web build:
 

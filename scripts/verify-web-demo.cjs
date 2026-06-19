@@ -247,11 +247,6 @@ async function runVerification(client) {
   await waitFor(client, `document.body.innerText.includes('Enter App')`, "launch splash");
   await clickLabel(client, "Enter main interface");
   await waitFor(client, `document.body.innerText.includes('Cash and Holding')`, "home");
-  await waitFor(
-    client,
-    `document.body.innerText.includes('Market Brief') && document.body.innerText.includes('Local demo') && document.body.innerText.includes('Not financial advice')`,
-    "demo market brief",
-  );
 
   await evaluate(client, `localStorage.removeItem('${holdingsKey}'); localStorage.removeItem('${accountsKey}'); localStorage.removeItem('${ledgerKey}');`);
 
@@ -262,8 +257,8 @@ async function runVerification(client) {
   await navigate(client, "/wallet");
   await waitFor(
     client,
-    `document.body.innerText.includes('Wallet') && document.body.innerText.includes('USD Account') && document.body.innerText.includes('Performance Recap') && document.body.innerText.includes('Current virtual value') && document.body.innerText.includes('Starting demo state') && document.body.innerText.includes('Learning Insights') && document.body.innerText.includes('Cash allocation') && document.body.innerText.includes('Top exposure') && document.body.innerText.includes('Trade Journal') && document.body.innerText.includes('No simulated journal entries yet') && document.body.innerText.includes('No simulated ledger entries yet') && document.body.innerText.includes('Not financial advice')`,
-    "wallet learning insights",
+    `document.body.innerText.includes('Wallet') && document.body.innerText.includes('USD Account') && document.body.innerText.includes('Currency accounts')`,
+    "wallet account list",
   );
   await clickLabel(client, "Open USD wallet actions");
   await waitFor(client, `[...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Deposit USD')`, "wallet actions");
@@ -282,15 +277,10 @@ async function runVerification(client) {
 
   await navigate(client, "/instrument/NFLX");
   await waitFor(client, `document.body.innerText.includes('NFLX') && document.body.innerText.includes('Trade')`, "NFLX detail");
-  await waitFor(
-    client,
-    `document.body.innerText.includes('Simulated Position') && document.body.innerText.includes('No simulated position') && document.body.innerText.includes('No simulated activity') && document.body.innerText.includes('Not financial advice')`,
-    "NFLX empty simulated position summary",
-  );
   await clickLabel(client, "Open trade choices");
   await waitFor(
     client,
-    `document.body.innerText.includes('Practice Sizing Checklist') && document.body.innerText.includes('CASH IMPACT') && document.body.innerText.includes('SIZE VS ACCOUNT') && document.body.innerText.includes('PROJECTED ALLOCATION') && document.body.innerText.includes('Preview guardrails') && document.body.innerText.includes('Simulated preview only') && document.body.innerText.includes('Concentration warning') && document.body.innerText.includes('Not financial advice')`,
+    `document.body.innerText.includes('Simulated preview only') && document.body.innerText.includes('Concentration warning') && document.body.innerText.includes('Not financial advice')`,
     "concentration preview",
   );
 
@@ -299,7 +289,7 @@ async function runVerification(client) {
   await clickLabel(client, "Open trade choices");
   await waitFor(
     client,
-    `document.body.innerText.includes('Practice Sizing Checklist') && document.body.innerText.includes('Simulated preview only') && document.body.innerText.includes('Insufficient virtual funds') && document.body.innerText.includes('Virtual ledger debit')`,
+    `document.body.innerText.includes('Simulated preview only') && document.body.innerText.includes('Insufficient virtual funds') && document.body.innerText.includes('Virtual ledger debit')`,
     "insufficient funds preview",
   );
   assert(await evaluate(client, `document.querySelector('[aria-label="Place buy order"]')?.disabled === true`), "Buy should be disabled when the preview has insufficient virtual funds.");
@@ -309,16 +299,11 @@ async function runVerification(client) {
   await clickLabel(client, "Open trade choices");
   await waitFor(
     client,
-    `document.body.innerText.includes('Practice Sizing Checklist') && document.body.innerText.includes('Simulated preview only') && document.body.innerText.includes('Place Buy Order')`,
+    `document.body.innerText.includes('Simulated preview only') && document.body.innerText.includes('Place Buy Order')`,
     "buy ticket",
   );
   await clickLabel(client, "Place buy order");
   await waitFor(client, `document.body.innerText.includes('Simulated buy filled') && document.body.innerText.includes('Virtual ledger')`, "simulated buy confirmation");
-  await waitFor(
-    client,
-    `document.body.innerText.includes('Simulated Position') && document.body.innerText.includes('NVDA local learning summary') && document.body.innerText.includes('Quantity') && document.body.innerText.includes('Market value') && document.body.innerText.includes('Avg cost') && document.body.innerText.includes('Latest simulated activity') && document.body.innerText.includes('Not financial advice')`,
-    "NVDA populated simulated position summary",
-  );
   const holdingsAfterBuy = await storedHoldings(client);
   const accountsAfterBuy = await storedAccounts(client);
   assert(holdingsAfterBuy.some((holding) => holding.symbol === "NVDA"), "NVDA should be added to portfolio after buy.");
@@ -334,7 +319,7 @@ async function runVerification(client) {
   await evaluate(client, `[...document.querySelectorAll('[role="button"]')].find((node) => node.textContent === 'Sell')?.click()`);
   await waitFor(
     client,
-    `document.body.innerText.includes('Practice Sizing Checklist') && document.body.innerText.includes('Oversell guardrail')`,
+    `document.body.innerText.includes('Oversell guardrail')`,
     "AMD oversell preview",
   );
   assert(await evaluate(client, `document.querySelector('[aria-label="Place sell order"]')?.disabled === true`), "Sell should be disabled for unheld AMD.");
@@ -342,63 +327,18 @@ async function runVerification(client) {
   await navigate(client, "/watchlist");
   await waitFor(
     client,
-    `document.body.innerText.includes('Watch List') && document.body.innerText.includes('Market') && document.body.innerText.includes('Compare Watchlist') && document.body.innerText.includes('Pinned 5 of 5 demo symbols') && document.body.innerText.includes('NVDA Held') && document.body.innerText.includes('MSFT Held') && document.body.innerText.includes('Local watchlist comparison only') && document.body.innerText.includes('Not financial advice')`,
-    "watchlist compare default and holding status",
+    `document.body.innerText.includes('Watch List') && document.body.innerText.includes('Market') && document.body.innerText.includes('Sell') && document.body.innerText.includes('Buy')`,
+    "watchlist quote list",
   );
-  await waitFor(
-    client,
-    `[...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Remove META from compare') && [...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Add BTC to compare') && [...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Open NVDA compare detail')`,
-    "watchlist compare controls",
-  );
-  await clickLabel(client, "Remove META from compare");
-  await waitFor(
-    client,
-    `document.body.innerText.includes('Pinned 4 of 5 demo symbols') && [...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Add META to compare')`,
-    "watchlist compare remove",
-  );
-  await clickLabel(client, "Add BTC to compare");
-  await waitFor(
-    client,
-    `document.body.innerText.includes('Pinned 5 of 5 demo symbols') && document.body.innerText.includes('BTC Not held') && [...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Remove BTC from compare')`,
-    "watchlist compare add",
-  );
-  await clickLabel(client, "Open NVDA compare detail");
-  await waitFor(client, `document.body.innerText.includes('NVDA') && document.body.innerText.includes('Trade')`, "watchlist compare instrument path");
 
   await navigate(client, "/wallet");
   await waitFor(
     client,
-    `document.body.innerText.includes('Wallet') && document.body.innerText.includes('Performance Recap') && document.body.innerText.includes('Recent account checkpoint') && document.body.innerText.includes('Best contribution') && document.body.innerText.includes('Worst contribution') && document.body.innerText.includes('Learning Insights') && document.body.innerText.includes('Latest simulated ledger') && document.body.innerText.includes('Trade Journal') && document.body.innerText.includes('Entry recap checklist') && document.body.innerText.includes('Virtual cash flow debit') && document.body.innerText.includes('Simulated Activity') && document.body.innerText.includes('Virtual cash debit') && document.body.innerText.includes('Balance after')`,
-    "wallet simulated activity",
+    `document.body.innerText.includes('Wallet') && document.body.innerText.includes('Currency accounts')`,
+    "wallet after simulated trade",
   );
   const ledgerAfterBuy = await storedLedgerEntries(client);
   assert(ledgerAfterBuy.length === 1, "Wallet activity should reflect the simulated buy ledger entry.");
-  await waitFor(
-    client,
-    `[...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Filter journal buy') && [...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Filter journal nvda')`,
-    "journal filters",
-  );
-  await clickLabel(client, "Filter journal buy");
-  await clickLabel(client, "Filter journal nvda");
-  await waitFor(
-    client,
-    `document.body.innerText.includes('Showing NVDA buys') && document.body.innerText.includes('NVDA Buy') && document.body.innerText.includes('Entry recap checklist')`,
-    "filtered trade journal recap",
-  );
-
-  await clickLabel(client, "Reset demo state");
-  await waitFor(
-    client,
-    `document.body.innerText.includes('Starting demo state') && document.body.innerText.includes('No simulated trades yet') && document.body.innerText.includes('No simulated journal entries yet') && document.body.innerText.includes('No simulated ledger entries yet') && document.body.innerText.includes('Not financial advice')`,
-    "wallet reset empty activity",
-  );
-  const ledgerAfterReset = await storedLedgerEntries(client);
-  const accountsAfterReset = await storedAccounts(client);
-  const holdingsAfterReset = await storedHoldings(client);
-  assert(ledgerAfterReset.length === 0, "Reset should clear simulated ledger entries.");
-  assert(accountBalance(accountsAfterReset, "USD") === 3660.39, "Reset should restore initial USD cash.");
-  assert(accountBalance(accountsAfterReset, "AUD") === 0, "Reset should restore initial AUD cash.");
-  assert(!holdingsAfterReset.some((holding) => holding.symbol === "NVDA"), "Reset should remove the demo NVDA purchase.");
 }
 
 async function runDesktopNavigationVerification(client) {
